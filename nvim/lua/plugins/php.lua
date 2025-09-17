@@ -1,32 +1,32 @@
 return {
   -- General PHP plugins and configurations
-  {
-    "stevearc/conform.nvim",
-    opts = function(_, opts)
-      opts.formatters_by_ft.php = { "pint" }
-      opts.formatters.pint = {
-        command = "pint",
-        args = {
-          "--no-interaction",
-          "--quiet",
-          "$FILENAME",
-        },
-        stdin = false, -- Pint needs a file, not stdin
-        cwd = require("conform.util").root_file({
-          "composer.json",
-          ".git",
-          "pint.json",
-          ".php-cs-fixer.php", -- ✅ added for projects using custom config
-        }),
-      }
-    end,
-  },
-  {
-    "mfussenegger/nvim-lint",
-    opts = function(_, opts)
-      opts.linters_by_ft.php = { "phpcs" }
-    end,
-  },
+  -- {
+  --   "stevearc/conform.nvim",
+  --   opts = function(_, opts)
+  --     opts.formatters_by_ft.php = { "pint" }
+  --     opts.formatters.pint = {
+  --       command = "pint",
+  --       args = {
+  --         "--no-interaction",
+  --         "--quiet",
+  --         "$FILENAME",
+  --       },
+  --       stdin = false, -- Pint needs a file, not stdin
+  --       cwd = require("conform.util").root_file({
+  --         "composer.json",
+  --         ".git",
+  --         "pint.json",
+  --         ".php-cs-fixer.php", -- ✅ added for projects using custom config
+  --       }),
+  --     }
+  --   end,
+  -- },
+  -- {
+  --   "mfussenegger/nvim-lint",
+  --   opts = function(_, opts)
+  --     opts.linters_by_ft.php = { "phpcs" }
+  --   end,
+  -- },
 
   -- Laravel specific plugins and configurations
   {
@@ -129,7 +129,7 @@ return {
     },
     event = { "VeryLazy" },
     opts = {
-      lsp_server = "phpactor", -- "phpactor | intelephense"
+      lsp_server = "intelephense", -- "phpactor | intelephense"
       features = {
         pickers = {
           provider = "snacks", -- "snacks | telescope | fzf-lua | ui-select"
@@ -188,7 +188,7 @@ return {
     },
     config = function(_, opts)
       require("blade-nav").setup(opts)
-      
+
       -- Optional: Configure global settings for blade-nav
       vim.g.blade_nav = {
         -- Add additional Laravel component paths if needed
@@ -209,13 +209,13 @@ return {
       opts.sources = opts.sources or {}
       opts.sources.default = opts.sources.default or {}
       opts.sources.providers = opts.sources.providers or {}
-      
+
       -- Add blade-nav to the default sources if not already present
       local sources = opts.sources.default
       if not vim.tbl_contains(sources, "blade-nav") then
         table.insert(sources, "blade-nav")
       end
-      
+
       -- Configure blade-nav provider
       opts.sources.providers["blade-nav"] = {
         module = "blade-nav.blink",
@@ -223,7 +223,7 @@ return {
           close_tag_on_complete = true, -- default: true,
         },
       }
-      
+
       return opts
     end,
   },
