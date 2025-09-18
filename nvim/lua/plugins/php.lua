@@ -129,7 +129,7 @@ return {
     },
     event = { "VeryLazy" },
     opts = {
-      lsp_server = "intelephense", -- "phpactor | intelephense"
+      lsp_server = "phpactor", -- "phpactor | intelephense"
       features = {
         pickers = {
           provider = "snacks", -- "snacks | telescope | fzf-lua | ui-select"
