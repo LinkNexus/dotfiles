@@ -1,32 +1,55 @@
 return {
   -- General PHP plugins and configurations
-  -- {
-  --   "stevearc/conform.nvim",
-  --   opts = function(_, opts)
-  --     opts.formatters_by_ft.php = { "pint" }
-  --     opts.formatters.pint = {
-  --       command = "pint",
-  --       args = {
-  --         "--no-interaction",
-  --         "--quiet",
-  --         "$FILENAME",
-  --       },
-  --       stdin = false, -- Pint needs a file, not stdin
-  --       cwd = require("conform.util").root_file({
-  --         "composer.json",
-  --         ".git",
-  --         "pint.json",
-  --         ".php-cs-fixer.php", -- ✅ added for projects using custom config
-  --       }),
-  --     }
-  --   end,
-  -- },
-  -- {
-  --   "mfussenegger/nvim-lint",
-  --   opts = function(_, opts)
-  --     opts.linters_by_ft.php = { "phpcs" }
-  --   end,
-  -- },
+  {
+    "stevearc/conform.nvim",
+    opts = function(_, opts)
+      -- Ensure formatters_by_ft exists
+      opts.formatters_by_ft = opts.formatters_by_ft or {}
+      opts.formatters_by_ft.php = { "pint" }
+
+      -- Ensure formatters exists
+      opts.formatters = opts.formatters or {}
+      opts.formatters.pint = {
+        command = "pint",
+        args = {
+          "--no-interaction",
+          "--quiet",
+          "$FILENAME",
+        },
+        stdin = false, -- Pint needs a file, not stdin
+        cwd = require("conform.util").root_file({
+          "composer.json",
+          ".git",
+          "pint.json",
+          ".php-cs-fixer.php", -- ✅ added for projects using custom config
+        }),
+      }
+    end,
+    keys = {
+      {
+        "<leader>cf",
+        function()
+          require("conform").format({ bufnr = vim.api.nvim_get_current_buf() })
+        end,
+        mode = "",
+        desc = "Format buffer with conform",
+      },
+    },
+  },
+  {
+    "mfussenegger/nvim-lint",
+    opts = function(_, opts)
+      opts.linters_by_ft.php = { "phpcs" }
+      opts.linters.phpcs = {
+        command = "phpcs",
+        args = {
+          "$FILENAME",
+        },
+        stdin = false, -- phpcs needs a file, not stdin
+        ignore_exitcode = true, -- phpcs returns non-zero exit codes for warnings/errors
+      }
+    end,
+  },
 
   -- Laravel specific plugins and configurations
   {
