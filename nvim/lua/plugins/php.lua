@@ -1,4 +1,63 @@
 return {
+  -- {
+  --   "neovim/nvim-lspconfig",
+  --   ft = { "php" }, -- Ensure it loads for PHP files
+  --   opts = {
+  --     servers = {
+  --       -- Disable phpactor completely
+  --       phpactor = false,
+
+  --       intelephense = {
+  --         -- Ensure proper command and filetypes
+  --         cmd = { "intelephense", "--stdio" },
+  --         settings = {
+  --           intelephense = {
+  --             files = {
+  --               maxSize = 5000000, -- 5 MB
+  --               exclude = {
+  --                 "**/vendor/**",
+  --                 "**/node_modules/**",
+  --                 "**/.git/**",
+  --                 "**/storage/**",
+  --                 "**/bootstrap/cache/**",
+  --               },
+  --             },
+  --             -- Disable formatting (use Pint instead)
+  --             format = {
+  --               enable = false,
+  --             },
+  --             -- Enhanced completion settings
+  --             completion = {
+  --               insertUseDeclaration = true,
+  --               fullyQualifyGlobalConstantsAndFunctions = false,
+  --               triggerParameterHints = true,
+  --               maxItems = 100,
+  --             },
+  --             -- Enable diagnostics
+  --             diagnostics = {
+  --               enable = true,
+  --               run = "onType",
+  --               embeddedLanguages = true,
+  --             },
+  --             -- Better PHPDoc support
+  --             phpdoc = {
+  --               returnVoid = true,
+  --               textFormat = "snippet",
+  --             },
+  --             -- Exclude vendor from references and rename
+  --             references = {
+  --               exclude = { "**/vendor/**" },
+  --             },
+  --             rename = {
+  --               exclude = { "**/vendor/**" },
+  --             },
+  --           },
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
+
   -- General PHP plugins and configurations
   {
     "stevearc/conform.nvim",
@@ -24,6 +83,13 @@ return {
           ".php-cs-fixer.php", -- ✅ added for projects using custom config
         }),
       }
+
+      -- -- Enable format on save
+      -- opts.format_on_save = opts.format_on_save or {}
+      -- if type(opts.format_on_save) == "table" then
+      --   opts.format_on_save.lsp_fallback = true
+      --   opts.format_on_save.timeout_ms = 500
+      -- end
     end,
     keys = {
       {
@@ -158,7 +224,7 @@ return {
           provider = "snacks", -- "snacks | telescope | fzf-lua | ui-select"
         },
         completion_provider = { enable = true },
-        route_info = { enable = true },
+        route_info = { enable = false }, -- Disabled to prevent error
         model_info = { enable = true },
         override = { enable = true },
       },
