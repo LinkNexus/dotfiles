@@ -1,5 +1,13 @@
 return {
   {
+    "stevearc/conform.nvim",
+    opts = {
+      formatters_by_ft = {
+        cs = { "csharpier" },
+      },
+    },
+  },
+  {
     "seblyng/roslyn.nvim",
     ---@module 'roslyn.config'
     ---@type RoslynNvimConfig

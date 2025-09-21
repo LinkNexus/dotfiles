@@ -14,6 +14,7 @@ return {
     -- In terminal mode, <Esc> goes to terminal program, <C-Space> exits terminal mode
     vim.keymap.set("t", "<Esc>", "<Esc>", { noremap = true })
 
+    vim.g.floaterm_autoinsert = 0
     vim.g.floaterm_width = 0.85
     vim.g.floaterm_height = 0.85
 
