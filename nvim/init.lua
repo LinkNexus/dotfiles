@@ -24,3 +24,11 @@ require("mason").setup({
     "netcoredbg",
   },
 })
+
+-- Undo on Ctrl+_
+vim.keymap.set("n", "<C-_>", "u", { noremap = true })
+vim.keymap.set("i", "<C-_>", "<C-o>u", { noremap = true })
+
+-- Redo on Ctrl-?
+vim.keymap.set("n", "<C-?>", "<C-r>", { noremap = true })
+vim.keymap.set("i", "<C-?>", "<C-o><C-r>", { noremap = true })

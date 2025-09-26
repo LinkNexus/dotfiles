@@ -229,21 +229,16 @@ return {
       "nvim-lua/plenary.nvim",
       "antoinemadec/FixCursorHold.nvim",
       "nvim-treesitter/nvim-treesitter",
-      "Issafalcon/neotest-dotnet",
+      -- "Issafalcon/neotest-dotnet",
+      "nsidorenco/neotest-vstest",
     },
     config = function()
       require("neotest").setup({
         adapters = {
-          require("neotest-dotnet"),
+          require("neotest-vstest"),
+          -- require("neotest-dotnet"),
         },
       })
     end,
-  },
-  {
-    "Issafalcon/neotest-dotnet",
-    lazy = false,
-    dependencies = {
-      "nvim-neotest/neotest",
-    },
   },
 }
