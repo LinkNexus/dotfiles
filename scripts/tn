@@ -1,0 +1,129 @@
+#!/usr/bin/env zsh
+
+# Tmux Navigator with Zoxide and JSON Configuration
+# Usage: tn <zoxide-query>
+# Requires: tmux, zoxide, jq
+
+if [ -z "$1" ]; then
+  echo "Usage: tn <directory-query>"
+  return 1
+fi
+
+# Check if jq is installed
+if ! command -v jq &>/dev/null; then
+  echo "Error: jq is required but not installed. Install it with your package manager."
+  return 1
+fi
+
+# Use zoxide to find the directory
+local target_dir=$(zoxide query "$1" 2>/dev/null)
+
+if [ -z "$target_dir" ]; then
+  echo "Error: Directory not found in zoxide database for query: $1"
+  return 1
+fi
+
+# Extract the directory name
+local dir_name=$(basename "$target_dir")
+
+# Create a valid tmux session name (replace dots and invalid chars with underscores)
+local session_name=$(echo "$dir_name" | sed 's/[.:]/_/g')
+
+# Check if session already exists
+if tmux has-session -t "$session_name" 2>/dev/null; then
+  if [ -n "$TMUX" ]; then
+    tmux switch-client -t "$session_name"
+  else
+    tmux attach-session -t "$session_name"
+  fi
+  return 0
+fi
+
+# Session doesn't exist, create it
+local config_file="$target_dir/tmux-session.json"
+
+if [ -f "$config_file" ]; then
+  echo "Found tmux-session.json, creating configured session..."
+
+  # Validate JSON
+  if ! jq empty "$config_file" 2>/dev/null; then
+    echo "Error: Invalid JSON in $config_file"
+    return 1
+  fi
+
+  # Create the session detached with a temporary window
+  tmux new-session -d -s "$session_name" -c "$target_dir"
+
+  # Get the number of windows
+  local num_windows=$(jq '.windows | length' "$config_file")
+
+  # Loop through each window
+  for ((i = 0; i < $num_windows; i++)); do
+    local window_name=$(jq -r ".windows[$i].name" "$config_file")
+
+    if [ $i -eq 0 ]; then
+      # Rename the first window instead of creating new
+      tmux rename-window -t "$session_name:0" "$window_name"
+    else
+      # Create new window
+      tmux new-window -t "$session_name:$i" -n "$window_name" -c "$target_dir"
+    fi
+
+    # Get the number of panes for this window
+    local num_panes=$(jq ".windows[$i].panes | length" "$config_file")
+
+    # Loop through each pane
+    for ((j = 0; j < $num_panes; j++)); do
+      if [ $j -gt 0 ]; then
+        # Get optional width and horizontal properties
+        local pane_width=$(jq -r ".windows[$i].panes[$j].width // \"\"" "$config_file")
+        local horizontal=$(jq -r ".windows[$i].panes[$j].horizontal // \"true\"" "$config_file")
+
+        # Choose split direction (horizontal = side-by-side, vertical = top/bottom)
+        if [ "$horizontal" = "true" ]; then
+          local split_flag="-h" # horizontal split (side-by-side)
+        else
+          local split_flag="-v" # vertical split (top/bottom)
+        fi
+
+        # Perform the split
+        if [ -n "$pane_width" ]; then
+          tmux split-window $split_flag -l "$pane_width" -t "$session_name:$i" -c "$target_dir"
+        else
+          tmux split-window $split_flag -t "$session_name:$i" -c "$target_dir"
+        fi
+      fi
+
+      # Get command(s) for this pane - can be string or array
+      local command_type=$(jq -r ".windows[$i].panes[$j].command | type" "$config_file")
+
+      if [ "$command_type" = "array" ]; then
+        # Handle array of commands
+        local num_commands=$(jq ".windows[$i].panes[$j].command | length" "$config_file")
+        for ((k = 0; k < $num_commands; k++)); do
+          local cmd=$(jq -r ".windows[$i].panes[$j].command[$k]" "$config_file")
+          tmux send-keys -t "$session_name:$i.$j" "$cmd" C-m
+        done
+      elif [ "$command_type" = "string" ]; then
+        # Handle single command string
+        local cmd=$(jq -r ".windows[$i].panes[$j].command" "$config_file")
+        tmux send-keys -t "$session_name:$i.$j" "$cmd" C-m
+      fi
+    done
+  done
+
+  # Select the first window and first pane
+  tmux select-window -t "$session_name:0"
+  tmux select-pane -t "$session_name:0.0"
+
+else
+  # No config file, create simple session
+  tmux new-session -d -s "$session_name" -c "$target_dir"
+fi
+
+# Attach or switch to the session
+if [ -n "$TMUX" ]; then
+  tmux switch-client -t "$session_name"
+else
+  tmux attach-session -t "$session_name"
+fi
