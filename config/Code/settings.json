@@ -1,0 +1,43 @@
+{
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "editor.fontFamily": "'Monaspace Radon NF', 'Cascadia Code', 'Droid Sans Mono', 'monospace', monospace",
+    "editor.fontLigatures": "'calt', 'liga', 'ss01', 'ss02', 'ss03', 'ss04', 'ss05', 'ss06', 'ss07', 'ss08', 'ss09'",
+    "editor.fontSize": 16,
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+        "source.organizeImports": "explicit"
+    },
+    "[blade]": {
+        "editor.defaultFormatter": "shufo.vscode-blade-formatter"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[json]": {
+        "editor.quickSuggestions": {
+            "strings": true
+        },
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "git.autofetch": true,
+    "explorer.compactFolders": false,
+    "editor.guides.bracketPairs": true,
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.fontFamily": "Cascadia Code",
+    "editor.suggest.insertMode": "replace",
+    "workbench.tree.indent": 15,
+    "editor.minimap.enabled": false,
+    "editor.renderWhitespace": "trailing",
+    "editor.linkedEditing": true,
+    "files.autoSave": "onFocusChange",
+    "vim.useSystemClipboard": true,
+    "workbench.iconTheme": "vscode-icons",
+    "containers.containerClient": "com.microsoft.visualstudio.containers.docker",
+    "containers.orchestratorClient": "com.microsoft.visualstudio.orchestrators.dockercompose",
+    "workbench.colorTheme": "Kanagawa Wave"
+}
