@@ -118,6 +118,7 @@ if [[ "$(uname)" == "Linux" ]]; then
 fi
 
 alias n="nvim"
+alias tn="$HOME/Labs/scripts/tn"
 
 # zsh parameter completion for the dotnet CLI
 _dotnet_zsh_complete()
@@ -138,3 +139,6 @@ _dotnet_zsh_complete()
 compdef _dotnet_zsh_complete dotnet
 
 export KITTY_CONFIG_DIRECTORY=$HOME/.config/kitty
+
+stty -ixon
+bindkey -r '^S'
