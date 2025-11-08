@@ -84,9 +84,9 @@
 
 font-family = "Monaspace Radon NF"
 theme = ayu
-font-size = 18
-background-opacity = 0.8
-background-blur = true
+font-size = 20
+background-opacity = 0.7
+background-blur = 10
 # Enable Option key as Meta key
 # macos-option-as-alt = true
 adjust-cell-height = 3

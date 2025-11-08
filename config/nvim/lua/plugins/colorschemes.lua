@@ -39,7 +39,6 @@ return {
     },
     config = function(_, opts)
       require("kanagawa").setup(opts)
-      vim.cmd.colorscheme("kanagawa")
     end,
   },
   {
@@ -83,6 +82,31 @@ return {
       -- directly inside the plugin declaration.
       vim.g.gruvbox_material_enable_italic = true
       -- vim.cmd.colorscheme("gruvbox-material")
+    end,
+  },
+  {
+    "folke/tokyonight.nvim",
+    lazy = false,
+    priority = 1000,
+    opts = {
+      style = "night",
+      -- transparent = true,
+      styles = {
+        comments = { italic = true },
+        -- strings = { italic = true },
+        -- keywords = { underline = true },
+        functions = { bold = true, italic = true },
+        variables = { bold = true },
+        operators = {},
+        types = { bold = true },
+        numbers = { bold = true },
+        -- sidebar = "transparent",
+        -- floats = "transparent",
+      },
+    },
+    config = function(_, opts)
+      require("tokyonight").setup(opts)
+      vim.cmd.colorscheme("tokyonight")
     end,
   },
 }
