@@ -1,5 +1,5 @@
 # If you come from bash you might have to change your $PATH.
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$HOME/bin:$HOME/.local/bin
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$HOME/bin:$HOME/.local/bin:$HOME/.dotnet/tools
 
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -115,6 +115,7 @@ fi
 
 alias n="nvim"
 alias tn="$HOME/Labs/scripts/tn"
+alias lla="exa -la --icons --color=always --group-directories-first --long --sort=type --time-style=long-iso"
 
 # zsh parameter completion for the dotnet CLI
 _dotnet_zsh_complete()
