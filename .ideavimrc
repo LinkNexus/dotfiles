@@ -1,0 +1,4 @@
+set anyobject
+Plug 'tpope/vim-commentary'
+
+set clipboard+=unnamed
