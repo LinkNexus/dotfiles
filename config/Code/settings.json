@@ -39,5 +39,5 @@
     "workbench.iconTheme": "vscode-icons",
     "containers.containerClient": "com.microsoft.visualstudio.containers.docker",
     "containers.orchestratorClient": "com.microsoft.visualstudio.orchestrators.dockercompose",
-    "workbench.colorTheme": "Kanagawa Wave"
+    "workbench.colorTheme": "Tokyo Night"
 }
