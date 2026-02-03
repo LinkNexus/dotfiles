@@ -1,0 +1,51 @@
+:root {
+  --ui-font: "Monaspace Radon", "Inter", system-ui;
+}
+
+.monaco-workbench,
+.quick-input-widget,
+.part,
+.pane-header,
+.monaco-list,
+.monaco-tree,
+.tabs-container,
+.tab {
+  font-family: var(--ui-font) !important;
+  letter-spacing: 0.01em;
+  font-variation-settings: "wght" 450;
+  font-feature-settings: "ss01", "ss02";
+}
+
+.monaco-workbench,
+.part,
+.pane-header,
+.monaco-tree,
+.tabs-container,
+.tab {
+  font-size: 16px !important;
+}
+
+/* Wider + taller command palette */
+.quick-input-widget {
+  width: 60vw !important; /* default ~45vw */
+  max-width: 900px !important; /* cap on big screens */
+  min-width: 600px !important;
+  font-size: 17px !important;
+}
+
+/* Make the results list taller */
+.quick-input-widget .monaco-list {
+  min-height: 50px !important;
+  max-height: 60vh !important; /* default ~40vh */
+}
+
+/* Overlay behind the quick input */
+.quick-input-widget::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: -1;
+}

@@ -7,6 +7,7 @@ config/Code/*
 !config/Code/User/*.json
 !config/Code/User/snippets/
 !config/Code/extensions.txt
+!config/Code/ui-custom.css
 config/Code/User/*/
 config/Code/User/*.bak
 config/Code/extensions/
