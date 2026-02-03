@@ -1,0 +1,116 @@
+{
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "editor.fontFamily": "'Monaspace Radon', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace",
+  "editor.inlineSuggest.fontFamily": "'Monaspace Radon', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace",
+  "editor.inlayHints.enabled": "on",
+  "editor.inlayHints.fontFamily": "'Monaspace Radon', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontLigatures": "'calt', 'ss01'",
+  "editor.fontSize": 19,
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "[blade]": {
+    "editor.defaultFormatter": "shufo.vscode-blade-formatter"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "git.autofetch": true,
+  "explorer.compactFolders": false,
+  "editor.guides.bracketPairs": "active",
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "workbench.tree.indent": 15,
+  "editor.minimap.enabled": false,
+  "editor.renderWhitespace": "trailing",
+  "editor.linkedEditing": true,
+  "editor.suggest.insertMode": "replace",
+  "files.autoSave": "onFocusChange",
+  "php.executablePath": "/usr/local/bin/php",
+  "php.validate.executablePath": "/usr/local/bin/php",
+  "workbench.colorCustomizations": {
+    "[Vira*]": {
+      "toolbar.activeBackground": "#80CBC426",
+      "button.background": "#80CBC4",
+      "button.hoverBackground": "#80CBC4cc",
+      "extensionButton.separator": "#80CBC433",
+      "extensionButton.background": "#80CBC414",
+      "extensionButton.foreground": "#80CBC4",
+      "extensionButton.hoverBackground": "#80CBC433",
+      "extensionButton.prominentForeground": "#80CBC4",
+      "extensionButton.prominentBackground": "#80CBC414",
+      "extensionButton.prominentHoverBackground": "#80CBC433",
+      "activityBarBadge.background": "#80CBC4",
+      "activityBar.activeBorder": "#80CBC4",
+      "activityBarTop.activeBorder": "#80CBC4",
+      "list.inactiveSelectionIconForeground": "#80CBC4",
+      "list.activeSelectionForeground": "#80CBC4",
+      "list.inactiveSelectionForeground": "#80CBC4",
+      "list.highlightForeground": "#80CBC4",
+      "sash.hoverBorder": "#80CBC480",
+      "list.activeSelectionIconForeground": "#80CBC4",
+      "scrollbarSlider.activeBackground": "#80CBC480",
+      "editorSuggestWidget.highlightForeground": "#80CBC4",
+      "textLink.foreground": "#80CBC4",
+      "progressBar.background": "#80CBC4",
+      "pickerGroup.foreground": "#80CBC4",
+      "tab.activeBorder": "#80CBC4",
+      "tab.activeBorderTop": "#80CBC400",
+      "tab.unfocusedActiveBorder": "#80CBC4",
+      "tab.unfocusedActiveBorderTop": "#80CBC400",
+      "tab.activeModifiedBorder": "#80CBC400",
+      "notificationLink.foreground": "#80CBC4",
+      "editorWidget.resizeBorder": "#80CBC4",
+      "editorWidget.border": "#80CBC4",
+      "settings.modifiedItemIndicator": "#80CBC4",
+      "panelTitle.activeBorder": "#80CBC4",
+      "breadcrumb.activeSelectionForeground": "#80CBC4",
+      "menu.selectionForeground": "#80CBC4",
+      "menubar.selectionForeground": "#80CBC4",
+      "editor.findMatchBorder": "#80CBC4",
+      "selection.background": "#80CBC440",
+      "statusBarItem.remoteBackground": "#80CBC414",
+      "statusBarItem.remoteHoverBackground": "#80CBC4",
+      "statusBarItem.remoteForeground": "#80CBC4",
+      "notebook.inactiveFocusedCellBorder": "#80CBC480",
+      "commandCenter.activeBorder": "#80CBC480",
+      "chat.slashCommandForeground": "#80CBC4",
+      "chat.avatarForeground": "#80CBC4",
+      "activityBarBadge.foreground": "#000000",
+      "button.foreground": "#000000",
+      "statusBarItem.remoteHoverForeground": "#000000",
+      "statusBar.debuggingBackground": "#80CBC433",
+      "statusBar.debuggingForeground": "#80CBC4"
+    }
+  },
+  "editor.lineNumbers": "relative",
+  "vim.useSystemClipboard": true,
+  "workbench.iconTheme": "vscode-icons",
+  "workbench.colorTheme": "Alt Catppuccin Mocha",
+  "window.titleBarStyle": "custom",
+  "makefile.configureOnOpen": true,
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1
+  },
+  "qt-core.additionalQtPaths": [
+    {
+      "name": "Qt-6.9.3-macx-clang_from_PATH",
+      "path": "/usr/local/bin/qtpaths"
+    }
+  ],
+  "php.validate.enable": true,
+  "terminal.integrated.fontSize": 17.5,
+  "chat.editor.fontSize": 14,
+  "chat.fontSize": 15,
+  "editor.glyphMargin": true,
+  "vscode_custom_css.imports": [
+    "file:///Users/nkenenglevy/.config/Code/ui-custom.css"
+  ],
+  "workbench.editor.showTabs": "none"
+}
