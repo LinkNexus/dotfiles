@@ -1,4 +1,31 @@
-set anyobject
-Plug 'tpope/vim-commentary'
+" --- Clipboard integration ---
+" Always use the system clipboard for yank, delete, change, and put
+set clipboard=unnamedplus
 
-set clipboard+=unnamedplus
+" --- Optional: Keep numbered registers for deletions ---
+" This means dd/yy won't overwrite your last yank if you delete something
+set clipboard+=unnamed
+
+" --- Optional: Map mac-style copy/paste shortcuts ---
+" Cmd-C and Cmd-V will work as expected in normal & visual mode
+nmap <D-c> "+y
+vmap <D-c> "+y
+nmap <D-v> "+p
+vmap <D-v> "+p
+imap <D-v> <Esc>"+pa
+
+" --- Quality-of-life ---
+" Make Y behave like D and C (yank until end of line, not whole line)
+nnoremap Y y$
+
+set relativenumber
+set number
+
+Plug 'vim-scripts/argtextobj.vim'
+Plug 'tpope/vim-commentary'
+Plug 'easymotion/vim-easymotion'
+set functiontextobj
+Plug 'machakann/vim-highlightedyank'
+Plug 'chrisbra/matchit'
+set which-key
+Plug 'tpope/vim-surround'

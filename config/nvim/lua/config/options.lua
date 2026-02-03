@@ -5,3 +5,7 @@
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.o.statuscolumn = "%s %{v:lnum} %{v:relnum} "
+vim.g.root_spec = {
+  { ".git" },
+  "cwd",
+}

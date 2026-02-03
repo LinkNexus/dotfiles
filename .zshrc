@@ -115,7 +115,12 @@ fi
 
 alias n="nvim"
 alias tn="$HOME/Labs/scripts/tn"
-alias lla="exa -la --icons --color=always --group-directories-first --long --sort=type --time-style=long-iso"
+alias nightmare="$HOME/Labs/nightmare/nightmare"
+alias ls='lsd'
+alias l='lsd -l'
+alias la='lsd -a'
+alias lla='lsd -la'
+alias lt='lsd --tree'
 
 # zsh parameter completion for the dotnet CLI
 _dotnet_zsh_complete()
@@ -139,3 +144,5 @@ export KITTY_CONFIG_DIRECTORY=$HOME/.config/kitty
 
 stty -ixon
 bindkey -r '^S'
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"

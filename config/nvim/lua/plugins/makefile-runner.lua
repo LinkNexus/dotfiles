@@ -1,5 +1,5 @@
 return {
-  dir = "~/Labs/projects/nvim_plugins/makefile-runner.nvim", -- or wherever you place it
+  dir = "~/Labs/nvim_plugins/makefile-runner.nvim", -- or wherever you place it
   dependencies = {
     "voldikss/vim-floaterm",
     "ibhagwan/fzf-lua",

@@ -1,3 +1,13 @@
-./config/tmux/plugins
-./config/nvim/lazy-lock.json
+config/tmux/plugins
+config/nvim/lazy-lock.json
 **/.idea
+config/Code/*
+!config/Code/User/
+!config/Code/User/*.json
+!config/Code/User/snippets/
+config/Code/User/*/
+config/Code/User/*.bak
+config/Code/extensions/
+config/Code/logs/
+config/Code/CachedData/
+

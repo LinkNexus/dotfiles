@@ -68,7 +68,7 @@ function CreatePanes {
         $pane = $panes[$i]
 
         if ($i -gt 0) {
-            $splitFlag = if ($pane.split -eq "horizontal") { "-h" } else { "-v" }
+            $splitFlag = if ($pane.split -eq "horizontal") { "-v" } else { "-h" }
 
             tmux split-window $splitFlag -t $target -c $workingDir
         }
