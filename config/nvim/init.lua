@@ -51,3 +51,4 @@ require("noice").setup({
   },
 })
 
+require("lazyvim.util").root.get = vim.loop.cwd
