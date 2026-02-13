@@ -106,7 +106,22 @@ return {
     },
     config = function(_, opts)
       require("tokyonight").setup(opts)
-      vim.cmd.colorscheme("tokyonight")
+      -- vim.cmd.colorscheme("tokyonight")
     end,
+  },
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    priority = 1000,
+    opts = {
+      comments = { italic = true },
+      strings = { italic = true },
+      keywords = { underline = true },
+      functions = { bold = true, italic = true },
+      variables = { bold = true },
+      operators = {},
+      types = { bold = true },
+      numbers = { bold = true },
+    },
   },
 }

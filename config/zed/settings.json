@@ -7,6 +7,7 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "ui_font_family": "Monaspace Radon",
   "buffer_font_family": "Monaspace Radon NF",
   "vim_mode": true,
   "terminal": {
@@ -33,6 +34,6 @@
   "theme": {
     "mode": "system",
     "light": "Ayu Light",
-    "dark": "Tokyo Night"
+    "dark": "Catppuccin Mocha"
   }
 }
