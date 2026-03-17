@@ -83,10 +83,12 @@
 # resize-overlay-duration = 4s 200ms
 
 font-family = "Monaspace Radon NF"
+font-feature = "ss01"
+font-feature = "ss02"
+font-feature = "ss03"
+font-feature = "liga"
 theme = ayu
 font-size = 20
 background-opacity = 0.7
 background-blur = 10
-# Enable Option key as Meta key
-# macos-option-as-alt = true
 adjust-cell-height = 3
