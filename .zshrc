@@ -10,6 +10,9 @@ export ZSH="$HOME/.oh-my-zsh"
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="robbyrussell"
 
+DISABLE_AUTO_UPDATE="true"
+DISABLE_LS_COLORS="true"
+
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
 # a theme from this variable instead of looking in $ZSH/themes/
@@ -116,11 +119,11 @@ fi
 alias n="nvim"
 alias tn="$HOME/Labs/scripts/tn"
 alias nightmare="$HOME/Labs/nightmare/nightmare"
-alias ls='lsd'
-alias l='lsd -l'
-alias la='lsd -a'
-alias lla='lsd -la'
-alias lt='lsd --tree'
+alias ls='eza --icons'
+alias l='eza -l --icons --git'
+alias la='eza -a --icons'
+alias lla='eza -la --icons --git'
+alias lt='eza --tree --icons'
 
 # zsh parameter completion for the dotnet CLI
 _dotnet_zsh_complete()
@@ -140,7 +143,7 @@ _dotnet_zsh_complete()
 
 compdef _dotnet_zsh_complete dotnet
 
-export KITTY_CONFIG_DIRECTORY=$HOME/.config/kitty
+# export KITTY_CONFIG_DIRECTORY=$HOME/.config/kitty
 
 stty -ixon
 bindkey -r '^S'
