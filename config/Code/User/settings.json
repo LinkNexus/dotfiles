@@ -85,4 +85,5 @@
   "docker.extension.enableComposeLanguageServer": false,
   "omnisharp.dotNetCliPaths": ["/usr/local/bin/dotnet"],
   "workbench.sideBar.location": "right",
+  "python.analysis.typeCheckingMode": "standard",
 }
