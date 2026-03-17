@@ -7,26 +7,18 @@ return {
       },
     },
   },
+
   {
     "seblyng/roslyn.nvim",
     ---@module 'roslyn.config'
     ---@type RoslynNvimConfig
     ft = { "cs", "razor" },
-    opts = {
-      -- your configuration comes here; leave empty for default settings
-    },
-
-    -- ADD THIS:
-
     dependencies = {
       {
-        -- By loading as a dependencies, we ensure that we are available to set
-        -- the handlers for Roslyn.
         "tris203/rzls.nvim",
         config = true,
       },
     },
-    lazy = false,
     config = function()
       -- Use one of the methods in the Integration section to compose the command.
       local mason_registry = require("mason-registry")
@@ -70,7 +62,6 @@ return {
       require("roslyn").setup()
     end,
     init = function()
-      -- We add the Razor file types before the plugin loads.
       vim.filetype.add({
         extension = {
           razor = "razor",
@@ -115,40 +106,27 @@ return {
           program = function()
             return require("dap-dll-autopicker").build_dll_path()
           end,
-
-          -- justMyCode = false,
-          -- stopAtEntry = false,
-          -- -- program = function()
-          -- --   -- todo: request input from ui
-          -- --   return "/path/to/your.dll"
-          -- -- end,
-          -- env = {
-          --   ASPNETCORE_ENVIRONMENT = function()
-          --     -- todo: request input from ui
-          --     return "Development"
-          --   end,
-          --   ASPNETCORE_URLS = function()
-          --     -- todo: request input from ui
-          --     return "http://localhost:5050"
-          --   end,
-          -- },
-          -- cwd = function()
-          --   -- todo: request input from ui
-          --   return vim.fn.getcwd()
-          -- end,
+          cwd = function()
+            local dll = require("dap-dll-autopicker").build_dll_path()
+            return vim.fn.fnamemodify(dll, ":h:h:h:h")
+          end,
+          env = {
+            ASPNETCORE_ENVIRONMENT = "Development",
+            DOTNET_ENVIRONMENT = "Development",
+          },
+          justMyCode = true,
         },
       }
     end,
   },
-  -- {
-  --   "nvim-neotest/neotest",
-  --   config = function()
-  --     require("neotest").setup({
-  --       adapters = {
-  --         -- require("neotest-vstest"),
-  --         require("neotest-dotnet"),
-  --       },
-  --     })
-  --   end,
-  -- },
+  {
+    "nvim-neotest/neotest",
+    config = function()
+      require("neotest").setup({
+        adapters = {
+          require("neotest-dotnet"),
+        },
+      })
+    end,
+  },
 }
