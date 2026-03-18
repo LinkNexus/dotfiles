@@ -11,28 +11,34 @@ return {
 
       vim.keymap.set("n", "<leader>to", "<cmd>FloatermNew --name=opencode opencode<cr>", { desc = "Open Opencode CLI" })
 
-      -- In terminal mode, <Esc> goes to terminal program, <C-Space> exits terminal mode
       vim.keymap.set("t", "<Esc>", "<Esc>", { noremap = true })
 
       vim.g.floaterm_autoinsert = 0
-      vim.g.floaterm_width = 0.85
-      vim.g.floaterm_height = 0.85
+      vim.g.floaterm_width = 0.75
+      vim.g.floaterm_height = 0.75
 
-      -- Send current line
       vim.keymap.set("n", "<leader>tl", function()
         vim.cmd("FloatermSend " .. vim.fn.getline("."))
       end, { desc = "Send Current Line to Floaterm" })
 
-      -- Send selection
       vim.keymap.set("v", "<leader>tv", function()
-        local _, ls, cs = unpack(vim.fn.getpos("'<"))
-        local _, le, ce = unpack(vim.fn.getpos("'>"))
-        local lines = vim.fn.getline(ls, le)
-        lines[#lines] = string.sub(lines[#lines], 1, ce)
-        lines[1] = string.sub(lines[1], cs)
-        local text = table.concat(lines, "\n")
-        vim.cmd("FloatermSend " .. text)
-      end, { desc = "Send Visual Selection to Floaterm" })
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
+
+        vim.schedule(function()
+          local lines = vim.fn.getregion(vim.fn.getpos("'<"), vim.fn.getpos("'>"), { type = vim.fn.visualmode() })
+          if #lines > 0 then
+            local cmd = table.concat(lines, " "):gsub("^%s*(.-)%s*$", "%1")
+            vim.cmd("FloatermNew --autoclose=0 " .. cmd)
+          end
+        end)
+      end, { desc = "Run Selection in New Floaterm" })
+
+      vim.keymap.set("n", "<leader>tl", function()
+        local line = vim.fn.getline("."):gsub("^%s*(.-)%s*$", "%1")
+        if line ~= "" then
+          vim.cmd("FloatermNew --autoclose=0 " .. line)
+        end
+      end, { desc = "Run Line in New Floaterm" })
     end,
   },
 }

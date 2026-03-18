@@ -124,12 +124,21 @@ return {
         },
         layouts = {
           {
+            -- bottom: scopes + repl side by side
             elements = {
               { id = "scopes", size = 0.6 },
-              { id = "console", size = 0.4 },
+              { id = "repl", size = 0.4 },
             },
             size = 15,
             position = "bottom",
+          },
+          {
+            -- right side: console for stdout
+            elements = {
+              { id = "console", size = 1.0 },
+            },
+            size = 40,
+            position = "right",
           },
         },
       })
