@@ -1,28 +1,48 @@
--- bootstrap lazy.nvim, LazyVim and your plugins
+function Get_local_plugin_path(plugin_name)
+    return vim.fs.joinpath(vim.fs.joinpath(vim.fn.stdpath("config"), "lua", "custom_plugins"), plugin_name)
+end
+
+require("config.options")
 require("config.lazy")
 
-require("mason").setup({
-  registries = {
-    "github:mason-org/mason-registry",
-    "github:Crashdummyy/mason-registry",
-  },
-  ensure_installed = {
-    "lua-language-server",
-    "xmlformatter",
-    "csharpier",
-    "stylua",
-    "html-lsp",
-    "css-lsp",
-    "typescript-language-server",
-    "json-lsp",
-    "roslyn",
-    "rzls",
-    "netcoredbg",
-    "clangd",
-  },
+local nightfox_themes = {
+    nightfox = true,
+    dayfox = true,
+    dawnfox = true,
+    duskfox = true,
+    nordfox = true,
+    terafox = true,
+    carbonfox = true,
+}
+
+local function apply_nightfox_inlay_hint_italics()
+    if not nightfox_themes[vim.g.colors_name] then
+        return
+    end
+
+    local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = "LspInlayHint", link = false })
+    if not ok then
+        return
+    end
+
+    hl.italic = true
+    vim.api.nvim_set_hl(0, "LspInlayHint", hl)
+end
+
+vim.api.nvim_create_autocmd("ColorScheme", {
+    pattern = { "nightfox", "dayfox", "dawnfox", "duskfox", "nordfox", "terafox", "carbonfox" },
+    callback = apply_nightfox_inlay_hint_italics,
 })
 
-vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]])
-vim.cmd.colorscheme("material-deep-ocean")
+vim.cmd.colorscheme("dayfox")
+apply_nightfox_inlay_hint_italics()
 
-require("lazyvim.util").root.get = vim.loop.cwd
+-- Global statusline (one line at the bottom for all windows)
+vim.opt.laststatus = 3
+
+-- Hide the default -- NORMAL -- / -- INSERT -- messages
+vim.opt.showmode = false
+
+-- Set command height to 0 to put lualine at the absolute bottom
+-- Note: Messages will now appear over lualine or require a keypress to clear
+vim.opt.cmdheight = 0
