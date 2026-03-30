@@ -81,9 +81,11 @@
     "https://biomejs.dev": true,
     "https://ui.shadcn.com": true,
   },
-  "workbench.colorTheme": "Best Themes - Catppuccin",
+  "workbench.colorTheme": "Safe Material Theme Ocean High Contrast",
   "docker.extension.enableComposeLanguageServer": false,
   "omnisharp.dotNetCliPaths": ["/usr/local/bin/dotnet"],
   "workbench.sideBar.location": "right",
   "python.analysis.typeCheckingMode": "standard",
+  "gitlens.ai.model": "vscode",
+  "gitlens.ai.vscode.model": "copilot:gpt-4.1",
 }
