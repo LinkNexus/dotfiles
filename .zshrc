@@ -116,6 +116,8 @@ if [[ "$(uname)" == "Linux" ]]; then
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
+# eval "$(starship init zsh)"
+
 alias n="nvim"
 alias tn="$HOME/Labs/scripts/tn"
 alias nightmare="$HOME/Labs/nightmare/nightmare"
