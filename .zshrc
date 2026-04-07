@@ -109,18 +109,17 @@ fi
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-source <(fzf --zsh)
-eval "$(zoxide init zsh --cmd cd)"
-
 if [[ "$(uname)" == "Linux" ]]; then
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
+source <(fzf --zsh)
+eval "$(zoxide init zsh --cmd cd)"
+
+
 # eval "$(starship init zsh)"
 
 alias n="nvim"
-alias tn="$HOME/Labs/scripts/tn"
-alias nightmare="$HOME/Labs/nightmare/nightmare"
 alias ls='eza --icons'
 alias l='eza -l --icons --git'
 alias la='eza -a --icons'
