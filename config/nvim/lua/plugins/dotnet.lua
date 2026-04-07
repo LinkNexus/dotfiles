@@ -1,55 +1,57 @@
 return {
   {
-    "stevearc/conform.nvim",
+    'stevearc/conform.nvim',
     optional = true,
     opts = function(_, opts)
       opts.formatters_by_ft = opts.formatters_by_ft or {}
-      opts.formatters_by_ft.cs = { "csharpier" }
+      opts.formatters_by_ft.cs = { 'csharpier' }
     end,
   },
 
   {
-    "tris203/rzls.nvim",
-    ft = { "cs", "razor" },
+    'tris203/rzls.nvim',
+    ft = { 'cs', 'razor' },
     config = true,
   },
 
   {
-    "seblyng/roslyn.nvim",
-    ft = { "cs", "razor" },
+    'seblyng/roslyn.nvim',
+    ---@module 'roslyn.config'
+    ---@type RoslynNvimConfig
+    ft = { 'cs', 'razor' },
     dependencies = {
-      "tris203/rzls.nvim",
+      'tris203/rzls.nvim',
     },
     init = function()
       vim.filetype.add({
         extension = {
-          razor = "razor",
-          cshtml = "razor",
+          razor = 'razor',
+          cshtml = 'razor',
         },
       })
     end,
     config = function()
-      local rzls_path = vim.fn.expand("$MASON/packages/rzls/libexec")
+      local rzls_path = vim.fn.expand('$MASON/packages/rzls/libexec')
       local log_dir = vim.fs.dirname(vim.lsp.get_log_path())
 
       local cmd = {
-        "roslyn",
-        "--stdio",
-        "--logLevel=Information",
-        "--extensionLogDirectory=" .. log_dir,
-        "--razorSourceGenerator=" .. vim.fs.joinpath(rzls_path, "Microsoft.CodeAnalysis.Razor.Compiler.dll"),
-        "--razorDesignTimePath=" .. vim.fs.joinpath(rzls_path, "Targets", "Microsoft.NET.Sdk.Razor.DesignTime.targets"),
-        "--extension",
-        vim.fs.joinpath(rzls_path, "RazorExtension", "Microsoft.VisualStudioCode.RazorExtension.dll"),
+        'roslyn',
+        '--stdio',
+        '--logLevel=Information',
+        '--extensionLogDirectory=' .. log_dir,
+        '--razorSourceGenerator=' .. vim.fs.joinpath(rzls_path, 'Microsoft.CodeAnalysis.Razor.Compiler.dll'),
+        '--razorDesignTimePath=' .. vim.fs.joinpath(rzls_path, 'Targets', 'Microsoft.NET.Sdk.Razor.DesignTime.targets'),
+        '--extension',
+        vim.fs.joinpath(rzls_path, 'RazorExtension', 'Microsoft.VisualStudioCode.RazorExtension.dll'),
       }
 
-      local ok_handlers, handlers = pcall(require, "rzls.roslyn_handlers")
+      local ok_handlers, handlers = pcall(require, 'rzls.roslyn_handlers')
 
-      vim.lsp.config("roslyn", {
+      vim.lsp.config('roslyn', {
         cmd = cmd,
         handlers = ok_handlers and handlers or nil,
         settings = {
-          ["csharp|inlay_hints"] = {
+          ['csharp|inlay_hints'] = {
             csharp_enable_inlay_hints_for_implicit_object_creation = true,
             csharp_enable_inlay_hints_for_implicit_variable_types = true,
             csharp_enable_inlay_hints_for_lambda_parameter_types = true,
@@ -63,129 +65,129 @@ return {
             dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
             dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
           },
-          ["csharp|code_lens"] = {
+          ['csharp|code_lens'] = {
             dotnet_enable_references_code_lens = true,
           },
         },
       })
 
-      require("roslyn").setup()
+      require('roslyn').setup()
     end,
   },
 
   {
-    "ramboe/ramboe-dotnet-utils",
-    ft = { "cs", "razor" },
+    'ramboe/ramboe-dotnet-utils',
+    ft = { 'cs', 'razor' },
     dependencies = {
-      "mfussenegger/nvim-dap",
+      'mfussenegger/nvim-dap',
     },
     config = function()
-      local dap = require("dap")
+      local dap = require('dap')
 
-      local netcoredbg = vim.fn.stdpath("data") .. "/mason/packages/netcoredbg/netcoredbg"
+      local netcoredbg = vim.fn.stdpath('data') .. '/mason/packages/netcoredbg/netcoredbg'
       if vim.fn.executable(netcoredbg) ~= 1 then
-        local shim = vim.fn.stdpath("data") .. "/mason/bin/netcoredbg"
+        local shim = vim.fn.stdpath('data') .. '/mason/bin/netcoredbg'
         if vim.fn.executable(shim) == 1 then
           netcoredbg = shim
         end
       end
 
       local netcoredbg_adapter = {
-        type = "executable",
+        type = 'executable',
         command = netcoredbg,
-        args = { "--interpreter=vscode" },
+        args = { '--interpreter=vscode' },
       }
 
       dap.adapters.netcoredbg = netcoredbg_adapter
       dap.adapters.coreclr = netcoredbg_adapter
 
       local function resolve_dll_path()
-        local ok_picker, picker = pcall(require, "dap-dll-autopicker")
-        if ok_picker and type(picker.build_dll_path) == "function" then
+        local ok_picker, picker = pcall(require, 'dap-dll-autopicker')
+        if ok_picker and type(picker.build_dll_path) == 'function' then
           return picker.build_dll_path()
         end
-        return vim.fn.input("Path to .dll: ", vim.fn.getcwd() .. "/", "file")
+        return vim.fn.input('Path to .dll: ', vim.fn.getcwd() .. '/', 'file')
       end
 
       dap.configurations.cs = {
         {
-          type = "coreclr",
-          name = "launch - netcoredbg",
-          request = "launch",
+          type = 'coreclr',
+          name = 'launch - netcoredbg',
+          request = 'launch',
           program = resolve_dll_path,
           cwd = function()
             local dll = resolve_dll_path()
-            return vim.fn.fnamemodify(dll, ":h:h:h:h")
+            return vim.fn.fnamemodify(dll, ':h:h:h:h')
           end,
           env = {
-            ASPNETCORE_ENVIRONMENT = "Development",
-            DOTNET_ENVIRONMENT = "Development",
+            ASPNETCORE_ENVIRONMENT = 'Development',
+            DOTNET_ENVIRONMENT = 'Development',
           },
           justMyCode = true,
         },
       }
 
       pcall(function()
-        require("dap-scope-walker").setup()
+        require('dap-scope-walker').setup()
       end)
     end,
   },
 
   {
-    "nvim-neotest/neotest",
-    ft = { "cs", "razor" },
+    'nvim-neotest/neotest',
+    ft = { 'cs', 'razor' },
     keys = {
       {
-        "<leader>tt",
+        '<leader>tt',
         function()
-          require("neotest").run.run()
+          require('neotest').run.run()
         end,
-        desc = "Test Nearest",
+        desc = 'Test Nearest',
       },
       {
-        "<leader>tT",
+        '<leader>tT',
         function()
-          require("neotest").run.run(vim.fn.expand("%"))
+          require('neotest').run.run(vim.fn.expand('%'))
         end,
-        desc = "Test File",
+        desc = 'Test File',
       },
       {
-        "<leader>td",
+        '<leader>td',
         function()
-          require("neotest").run.run({ strategy = "dap" })
+          require('neotest').run.run({ strategy = 'dap' })
         end,
-        desc = "Debug Nearest Test",
+        desc = 'Debug Nearest Test',
       },
       {
-        "<leader>ts",
+        '<leader>ts',
         function()
-          require("neotest").summary.toggle()
+          require('neotest').summary.toggle()
         end,
-        desc = "Toggle Test Summary",
+        desc = 'Toggle Test Summary',
       },
       {
-        "<leader>to",
+        '<leader>to',
         function()
-          require("neotest").output.open({ enter = true, auto_close = true })
+          require('neotest').output.open({ enter = true, auto_close = true })
         end,
-        desc = "Test Output",
+        desc = 'Test Output',
       },
       {
-        "<leader>tO",
+        '<leader>tO',
         function()
-          require("neotest").output_panel.toggle()
+          require('neotest').output_panel.toggle()
         end,
-        desc = "Toggle Test Output Panel",
+        desc = 'Toggle Test Output Panel',
       },
     },
     dependencies = {
-      "nvim-neotest/nvim-nio",
-      "Issafalcon/neotest-dotnet",
+      'nvim-neotest/nvim-nio',
+      'Issafalcon/neotest-dotnet',
     },
     config = function()
-      require("neotest").setup({
+      require('neotest').setup({
         adapters = {
-          require("neotest-dotnet"),
+          require('neotest-dotnet'),
         },
       })
     end,
