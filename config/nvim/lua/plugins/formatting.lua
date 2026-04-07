@@ -11,6 +11,7 @@ return {
       opts.formatters_by_ft.typescriptreact = { "biome-check" }
       opts.formatters_by_ft.json = { "biome-check" }
       opts.formatters_by_ft.jsonc = { "biome-check" }
+      opts.formatters_by_ft.python = { "black" }
 
       opts.formatters = opts.formatters or {}
       opts.formatters.stylua = {

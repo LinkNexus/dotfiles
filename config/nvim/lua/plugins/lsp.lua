@@ -119,6 +119,17 @@ return {
             offsetEncoding = { 'utf-16' },
           },
         },
+        basedpyright = {
+          settings = {
+            python = {
+              analysis = {
+                autoImportCompletions = true,
+                typeCheckingMode = 'basic',
+                stubPath = './typings',
+              },
+            },
+          },
+        },
         html = {},
         cssls = {},
         jsonls = {},
@@ -522,6 +533,7 @@ return {
         'rzls',
         'netcoredbg',
         'clangd',
+        'black',
       },
     },
     config = function(_, opts)
