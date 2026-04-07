@@ -120,10 +120,21 @@ local wezterm = require("wezterm")
 local act = wezterm.action
 local config = wezterm.config_builder()
 local is_darwin = wezterm.target_triple:find("darwin") ~= nil
+local function is_windows()
+  return package.config:sub(1,1) == "\\" or os.getenv("OS") == "Windows_NT"
+end
+
+if is_windows() then
+	config.default_prog = {"pwsh.exe"}
+end
 
 -- ── Font ────────────────────────────────────────────────────────────
 config.font = wezterm.font("Cascadia Code NF", { weight = "Regular" })
-config.font_size = 20
+
+if is_darwin then
+	config.font_size = 20
+end
+
 config.font_rules = {
   {
     intensity = "Bold",
