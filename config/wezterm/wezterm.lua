@@ -133,6 +133,8 @@ config.font = wezterm.font("Cascadia Code NF", { weight = "Regular" })
 
 if is_darwin then
   config.font_size = 20
+elseif is_windows() then
+  config.font_size = 14
 end
 
 config.font_rules = {
