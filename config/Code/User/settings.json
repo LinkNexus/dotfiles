@@ -81,7 +81,6 @@
     "https://biomejs.dev": true,
     "https://ui.shadcn.com": true,
   },
-  "workbench.colorTheme": "Safe Material Theme Ocean High Contrast",
   "docker.extension.enableComposeLanguageServer": false,
   "omnisharp.dotNetCliPaths": ["/usr/local/bin/dotnet"],
   "workbench.sideBar.location": "right",
