@@ -5,6 +5,7 @@ local is_darwin = wezterm.target_triple:find("darwin") ~= nil
 local function is_windows()
   return package.config:sub(1, 1) == "\\" or os.getenv("OS") == "Windows_NT"
 end
+local font_name = "FiraCode Nerd Font"
 
 if is_windows() then
   config.default_prog = { "pwsh.exe" }
@@ -12,21 +13,14 @@ if is_windows() then
 end
 
 -- ── Font ────────────────────────────────────────────────────────────
-config.font = wezterm.font("FiraCode Nerd Font Mono", { weight = "Medium" })
+config.font = wezterm.font(font_name, { weight = "Medium" })
 
 if is_darwin then
-  config.font_size = 19.5
+  config.font_size = 20
 elseif is_windows() then
   config.font_size = 14
 end
 
-config.font_rules = {
-  {
-    intensity = "Bold",
-    italic = false,
-    font = wezterm.font("FiraCode Nerd Font Mono", { weight = "ExtraBold" }),
-  },
-}
 config.harfbuzz_features =
   { "ss01", "ss02", "ss03", "ss04", "ss05", "ss06", "ss07", "ss08", "ss19", "ss20", "liga", "calt" }
 config.line_height = 1.1
