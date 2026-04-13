@@ -16,7 +16,6 @@ require("mason").setup({
     "typescript-language-server",
     "json-lsp",
     "roslyn",
-    "rzls",
     "netcoredbg",
     "clangd",
   },
