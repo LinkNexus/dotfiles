@@ -7,21 +7,11 @@ return {
       opts.formatters_by_ft.cs = { 'csharpier' }
     end,
   },
-
-  {
-    'tris203/rzls.nvim',
-    ft = { 'cs', 'razor' },
-    config = true,
-  },
-
   {
     'seblyng/roslyn.nvim',
     ---@module 'roslyn.config'
     ---@type RoslynNvimConfig
     ft = { 'cs', 'razor' },
-    dependencies = {
-      'tris203/rzls.nvim',
-    },
     init = function()
       vim.filetype.add({
         extension = {
@@ -32,7 +22,7 @@ return {
     end,
     config = function()
       local rzls_path = vim.fn.expand('$MASON/packages/rzls/libexec')
-      local log_dir = vim.fs.dirname(vim.lsp.get_log_path())
+      local log_dir = vim.fs.dirname(vim.lsp.log.get_filename())
 
       local cmd = {
         'roslyn',

@@ -3,7 +3,7 @@ return {
     'sainnhe/gruvbox-material',
     lazy = true,
     config = function()
-      vim.g.gruvbox_material_enable_italic = true
+      -- vim.g.gruvbox_material_enable_italic = true
       vim.g.gruvbox_material_background = 'hard'
       vim.g.gruvbox_material_foreground = 'original'
       -- vim.g.gruvbox_material_transparent_background = true
@@ -19,11 +19,11 @@ return {
       -- Available themes: "wave", "dragon", "lotus"
       compile = true,
       theme = 'wave',
-      commentStyle = { italic = true },
-      functionStyle = { italic = true, bold = true },
-      keywordStyle = { italic = true },
-      statementStyle = { italic = true },
-      typeStyle = { bold = true, italic = true },
+      -- commentStyle = { italic = true },
+      -- functionStyle = { italic = true, bold = true },
+      -- keywordStyle = { italic = true },
+      -- statementStyle = { italic = true },
+      -- typeStyle = { bold = true, italic = true },
 
       dimInactive = false,
       globalStatus = true,
@@ -49,15 +49,15 @@ return {
     lazy = true,
     opts = {
       options = {
-        styles = {
-          comments = 'italic',
-          constants = 'bold',
-          keywords = 'italic',
-          types = 'italic,bold',
-          strings = 'italic',
-          functions = 'italic,bold',
-          conditionals = 'italic',
-        },
+        -- styles = {
+        --   comments = 'italic',
+        --   constants = 'bold',
+        --   keywords = 'italic',
+        --   types = 'italic,bold',
+        --   strings = 'italic',
+        --   functions = 'italic,bold',
+        --   conditionals = 'italic',
+        -- },
       },
     },
   },
