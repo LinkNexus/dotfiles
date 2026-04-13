@@ -18,7 +18,7 @@ config.font = wezterm.font(font_name, { weight = "Medium" })
 if is_darwin then
   config.font_size = 20
 elseif is_windows() then
-  config.font_size = 14
+  config.font_size = 13
 end
 
 config.harfbuzz_features =
