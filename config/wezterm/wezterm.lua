@@ -1,127 +1,8 @@
--- local wezterm = require("wezterm")
--- local config = wezterm.config_builder()
--- local is_darwin = wezterm.target_triple:find("darwin") ~= nil
---
--- -- ── Font ────────────────────────────────────────────────────────────
---
--- config.font = wezterm.font("Cascadia Code NF", {
--- 	weight = "Regular",
--- })
--- config.font_size = 20
---
--- config.font_rules = {
--- 	{
--- 		intensity = "Bold",
--- 		italic = false,
--- 		font = wezterm.font("Cascadia Code NF", { weight = "Bold" }),
--- 	},
--- }
---
--- config.harfbuzz_features = {
--- 	"ss01", -- ligatures set 1
--- 	"ss02",
--- 	"ss03",
--- 	"ss04",
--- 	"ss05",
--- 	"ss06",
--- 	"ss07",
--- 	"ss08",
--- 	"ss19",
--- 	"ss20",
--- 	"liga",
--- 	"calt",
--- }
---
--- -- ── Appearance ──────────────────────────────────────────────────────
--- -- config.color_scheme = "Ayu Dark (Gogh)"
--- -- config.window_background_opacity = 0.65
--- config.macos_window_background_blur = 15
--- config.window_padding = {
--- 	left = 10,
--- 	right = 10,
--- 	top = 0,
--- 	bottom = 10,
--- }
--- config.line_height = 1.1
---
--- -- ── Window decorations ──────────────────────────────────────────────
--- config.window_close_confirmation = "NeverPrompt"
---
--- -- ── Cursor ──────────────────────────────────────────────────────────
--- config.default_cursor_style = "BlinkingBlock"
--- config.cursor_blink_rate = 500
--- config.cursor_blink_ease_in = "Constant"
--- config.cursor_blink_ease_out = "Constant"
---
--- -- ── Tab bar ─────────────────────────────────────────────────────────
--- config.enable_tab_bar = true
--- config.use_fancy_tab_bar = false
--- config.hide_tab_bar_if_only_one_tab = true
--- config.tab_bar_at_bottom = true
--- config.tab_max_width = 32
---
--- -- ── Tab Configuration ──────────────────────────────────────────────
--- -- Customize these settings to control tab display behavior
--- local tab_config = {
--- 	show_time_in_status = true, -- Set to false to hide time in right status
--- }
---
--- -- ── Right Status (Time) ─────────────────────────────────────────────
--- wezterm.on("update-right-status", function(window, pane)
--- 	if not tab_config.show_time_in_status then
--- 		return
--- 	end
---
--- 	local time = wezterm.strftime("%H:%M")
--- 	local date = wezterm.strftime("%a %d")
---
--- 	-- Create time/date display with gruvbox colors
--- 	window:set_right_status(wezterm.format({
--- 		{ Text = " " .. date .. " " },
--- 		{ Text = " " .. time .. " " },
--- 	}))
--- end)
---
--- -- ── Scrollback ──────────────────────────────────────────────────────
--- config.scrollback_lines = 5000
---
--- -- ── Bell ────────────────────────────────────────────────────────────
--- config.audible_bell = "Disabled"
--- config.visual_bell = {
--- 	fade_in_duration_ms = 75,
--- 	fade_out_duration_ms = 75,
--- 	target = "CursorColor",
--- }
---
--- -- ── Keys ────────────────────────────────────────────────────────────
--- local mod = is_darwin and "CMD" or "CTRL|SHIFT"
---
--- config.keys = {
--- 	{ key = "t", mods = mod, action = wezterm.action.SpawnTab("CurrentPaneDomain") },
--- 	{ key = "w", mods = mod, action = wezterm.action.CloseCurrentTab({ confirm = false }) },
--- 	{ key = "d", mods = mod, action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
--- 	{ key = "d", mods = mod .. "|SHIFT", action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }) },
--- 	{ key = "h", mods = mod .. "|ALT", action = wezterm.action.ActivatePaneDirection("Left") },
--- 	{ key = "l", mods = mod .. "|ALT", action = wezterm.action.ActivatePaneDirection("Right") },
--- 	{ key = "k", mods = mod .. "|ALT", action = wezterm.action.ActivatePaneDirection("Up") },
--- 	{ key = "j", mods = mod .. "|ALT", action = wezterm.action.ActivatePaneDirection("Down") },
--- 	{ key = "=", mods = mod, action = wezterm.action.IncreaseFontSize },
--- 	{ key = "-", mods = mod, action = wezterm.action.DecreaseFontSize },
--- 	{ key = "0", mods = mod, action = wezterm.action.ResetFontSize },
--- 	{ key = "c", mods = mod, action = wezterm.action.CopyTo("Clipboard") },
--- 	{ key = "v", mods = mod, action = wezterm.action.PasteFrom("Clipboard") },
--- 	{ key = "w", mods = mod .. "|ALT", action = wezterm.action.CloseCurrentPane({ confirm = false }) },
--- }
---
--- return config
---
-
 local wezterm = require("wezterm")
 local act = wezterm.action
 local config = wezterm.config_builder()
 local is_darwin = wezterm.target_triple:find("darwin") ~= nil
 local function is_windows()
-  return package.config:sub(1, 1) == "\\" or os.getenv("OS") == "Windows_NT"
   return package.config:sub(1, 1) == "\\" or os.getenv("OS") == "Windows_NT"
 end
 
@@ -131,10 +12,10 @@ if is_windows() then
 end
 
 -- ── Font ────────────────────────────────────────────────────────────
-config.font = wezterm.font("Cascadia Code NF", { weight = "Regular" })
+config.font = wezterm.font("FiraCode Nerd Font Mono", { weight = "Medium" })
 
 if is_darwin then
-  config.font_size = 20
+  config.font_size = 19.5
 elseif is_windows() then
   config.font_size = 14
 end
@@ -143,7 +24,7 @@ config.font_rules = {
   {
     intensity = "Bold",
     italic = false,
-    font = wezterm.font("Cascadia Code NF", { weight = "Bold" }),
+    font = wezterm.font("FiraCode Nerd Font Mono", { weight = "ExtraBold" }),
   },
 }
 config.harfbuzz_features =
