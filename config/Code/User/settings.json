@@ -87,4 +87,6 @@
   "python.analysis.typeCheckingMode": "standard",
   "gitlens.ai.model": "vscode",
   "gitlens.ai.vscode.model": "copilot:gpt-4.1",
+  "workbench.colorTheme": "Dark Modern",
+  "claudeCode.preferredLocation": "panel",
 }
