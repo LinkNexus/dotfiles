@@ -1,0 +1,6 @@
+[submodule "config/nvim/lua/custom_plugins/cpp_header_sync.nvim"]
+	path = config/nvim/lua/custom_plugins/cpp_header_sync.nvim
+	url = git@github.com:LinkNexus/cpp_header_sync.nvim.git
+[submodule "config/nvim/lua/custom_plugins/makefile-runner.nvim"]
+	path = config/nvim/lua/custom_plugins/makefile-runner.nvim
+	url = git@github.com:LinkNexus/makefile-runner.nvim.git

@@ -49,15 +49,15 @@ return {
     lazy = true,
     opts = {
       options = {
-        -- styles = {
-        --   comments = 'italic',
-        --   constants = 'bold',
-        --   keywords = 'italic',
-        --   types = 'italic,bold',
-        --   strings = 'italic',
-        --   functions = 'italic,bold',
-        --   conditionals = 'italic',
-        -- },
+        styles = {
+          -- comments = 'italic',
+          -- constants = 'bold',
+          -- keywords = 'italic',
+          -- types = 'bold',
+          -- strings = 'italic',
+          -- functions = 'bold',
+          -- conditionals = 'italic',
+        },
       },
     },
   },
