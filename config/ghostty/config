@@ -82,13 +82,16 @@
 
 # resize-overlay-duration = 4s 200ms
 
-font-family = "Monaspace Radon NF"
+# font-family = "Monaspace Radon NF"
+font-family = "FiraCode Nerd Font Mono"
+font-style = "Retina"
 font-feature = "ss01"
 font-feature = "ss02"
 font-feature = "ss03"
 font-feature = "liga"
-theme = ayu
-font-size = 20
+# theme = ayu
+font-size = 19
 background-opacity = 0.7
 background-blur = 10
 adjust-cell-height = 3
+cursor-color = "#ff0000"

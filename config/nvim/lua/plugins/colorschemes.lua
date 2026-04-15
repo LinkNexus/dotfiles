@@ -52,7 +52,7 @@ return {
         styles = {
           -- comments = 'italic',
           -- constants = 'bold',
-          -- keywords = 'italic',
+          -- keywords = 'bold',
           -- types = 'bold',
           -- strings = 'italic',
           -- functions = 'bold',

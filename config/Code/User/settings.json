@@ -1,6 +1,6 @@
 {
   "github.copilot.nextEditSuggestions.enabled": true,
-  "editor.fontFamily": "'Monaspace Radon', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontFamily": "'FiraCode Nerd Font Mono', 'Monaspace Radon', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace",
   "editor.inlineSuggest.fontFamily": "'Monaspace Radon', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace",
   "editor.inlayHints.enabled": "on",
   "editor.inlayHints.fontFamily": "'Monaspace Radon', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace",
@@ -87,6 +87,6 @@
   "python.analysis.typeCheckingMode": "standard",
   "gitlens.ai.model": "vscode",
   "gitlens.ai.vscode.model": "copilot:gpt-4.1",
-  "workbench.colorTheme": "Dark Modern",
+  "workbench.colorTheme": "Carbonfox",
   "claudeCode.preferredLocation": "panel",
 }
