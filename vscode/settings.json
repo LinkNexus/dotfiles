@@ -1,0 +1,57 @@
+{
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "editor.fontFamily": "'MonaspiceRn Nerd Font', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace",
+  "editor.inlineSuggest.fontFamily": "'MonaspiceRn Nerd Font', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace",
+  "editor.inlayHints.enabled": "on",
+  "editor.inlayHints.fontFamily": "'MonaspiceRn Nerd Font', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontLigatures": "'calt', 'ss01', 'ss02', 'ss03', 'ss04', 'ss05', 'ss06', 'ss07', 'ss08', 'ss09', 'ss10', 'liga'",
+  "editor.fontSize": 17,
+  "editor.fontWeight": "500",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "always",
+    "source.organizeImports": "always"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true,
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true,
+  },
+  "[json]": {
+    "editor.quickSuggestions": {
+      "strings": true,
+    },
+    "editor.suggest.insertMode": "replace",
+    "editor.defaultFormatter": "biomejs.biome",
+  },
+  "[csharp]": {
+    "editor.maxTokenizationLineLength": 2500,
+    "editor.defaultFormatter": "csharpier.csharpier-vscode",
+  },
+  "git.autofetch": true,
+  "explorer.compactFolders": false,
+  "editor.guides.bracketPairs": "active",
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "workbench.tree.indent": 15,
+  "workbench.tree.renderIndentGuides": "always",
+  "editor.minimap.enabled": false,
+  "editor.renderWhitespace": "trailing",
+  "editor.linkedEditing": true,
+  "editor.suggest.insertMode": "replace",
+  "files.autoSave": "onFocusChange",
+  "editor.lineNumbers": "relative",
+  "vim.useSystemClipboard": true,
+  "window.titleBarStyle": "custom",
+  "makefile.configureOnOpen": true,
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1,
+  },
+  "workbench.iconTheme": "vscode-icons",
+  "python.analysis.typeCheckingMode": "standard",
+  "workbench.colorTheme": "Carbonfox"
+}
