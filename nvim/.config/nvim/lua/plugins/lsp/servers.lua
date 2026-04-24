@@ -44,6 +44,7 @@ function M.setup(capabilities)
         "--completion-style=detailed",
         "--function-arg-placeholders",
         "--fallback-style=llvm",
+        "--query-driver=/run/current-system/sw/bin/avr-gcc",
       },
       root_markers = {
         "compile_commands.json",
