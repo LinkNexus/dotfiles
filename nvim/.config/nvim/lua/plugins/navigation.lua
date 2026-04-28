@@ -71,7 +71,9 @@ return {
       {
         "<leader><leader>",
         function()
-          require("fzf-lua").files()
+          require("fzf-lua").files({
+            git_opts = "--cached --others --exclude-standard",
+          })
         end,
         desc = "Find Files",
       },
