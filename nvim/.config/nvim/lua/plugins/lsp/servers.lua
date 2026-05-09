@@ -83,6 +83,24 @@ function M.setup(capabilities)
     jsonls = {},
     vtsls = {},
     biome = {},
+    powershell = {
+      cmd = {
+        "pwsh",
+        "-NoProfile",
+        "-Command",
+        vim.fn.stdpath("data") .. "/mason/packages/powershell-editor-services/PowerShellEditorServices/Start-EditorServices.ps1",
+      },
+      settings = {
+        powershell = {
+          codeFormatting = {
+            preset = "OTBS",
+          },
+          scriptAnalysis = {
+            enable = true,
+          },
+        },
+      },
+    },
   }
 
   local mason_servers = vim.tbl_keys(servers)
