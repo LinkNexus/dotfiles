@@ -1,4 +1,4 @@
-export PATH="$HOME/.local/share/nvim/mason/bin:$PATH"
+export PATH="$HOME/.local/share/nvim/mason/bin:/opt/homebrew/bin:$PATH"
 
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -149,3 +149,4 @@ stty -ixon
 bindkey -r '^S'
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
+export HOMEBREW_BUNDLE_FILE="$HOME/Brewfile"

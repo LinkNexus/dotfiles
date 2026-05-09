@@ -24,6 +24,7 @@ return {
         "clangd",
         "clang-format",
         "codelldb",
+        "powershell-editor-services",
       },
     },
     config = function(_, opts)

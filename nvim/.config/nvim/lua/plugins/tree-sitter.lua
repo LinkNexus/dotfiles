@@ -37,6 +37,7 @@ return {
         "yaml",
         "cmake",
         "c_sharp",
+        "powershell",
       },
       textobjects = {
         select = {

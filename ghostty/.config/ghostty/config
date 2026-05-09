@@ -1,6 +1,6 @@
-# font-family = MonaspiceRn Nerd Font
-font-family = Cascadia Code NF
-# font-style = "Medium"
+font-family = MonaspiceRn Nerd Font
+# font-family = Cascadia Code NF
+font-style = "Medium"
 font-feature = "ss01"
 font-feature = "ss02"
 font-feature = "ss03"
@@ -18,3 +18,5 @@ background-blur = 10
 custom-shader = shaders/cursor_trail.glsl
 theme = nightfox
 window-padding-x = 10
+adjust-cell-width = -6%
+macos-auto-secure-input = false
