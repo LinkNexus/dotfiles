@@ -190,6 +190,11 @@ return {
 
       local dap = require("dap")
 
+      local ok_powershell, powershell = pcall(require, "core.powershell")
+      if ok_powershell then
+        powershell.setup_dap()
+      end
+
       -- C & C++ config
       dap.adapters.codelldb = {
         type = "server",
