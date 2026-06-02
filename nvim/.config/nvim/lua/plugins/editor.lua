@@ -35,56 +35,9 @@ return {
     },
   },
   {
-    "nvim-mini/mini.ai",
-    event = "VeryLazy",
-    opts = function()
-      local ai = require("mini.ai")
-      return {
-        n_lines = 500,
-        custom_textobjects = {
-          o = ai.gen_spec.treesitter({
-            a = { "@block.outer", "@conditional.outer", "@loop.outer" },
-            i = { "@block.inner", "@conditional.inner", "@loop.inner" },
-          }),
-          f = ai.gen_spec.treesitter({ a = "@function.outer", i = "@function.inner" }),
-          c = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }),
-          t = { "<([%p%w]-)%f[^<%w][^<>]->.-</%1>", "^<.->().*()</[^/]->$" },
-          d = { "%f[%d]%d+" },
-          e = {
-            {
-              "%u[%l%d]+%f[^%l%d]",
-              "%f[%S][%l%d]+%f[^%l%d]",
-              "%f[%P][%l%d]+%f[^%l%d]",
-              "^[%l%d]+%f[^%l%d]",
-            },
-            "^().*()$",
-          },
-          g = function()
-            local from = { line = 1, col = 1 }
-            local to = { line = vim.fn.line("$"), col = vim.fn.getline("$"):len() }
-            return { from = from, to = to }
-          end,
-          u = ai.gen_spec.function_call(),
-          U = ai.gen_spec.function_call({ name_pattern = "[%w_]" }),
-        },
-      }
-    end,
-  },
-  {
     "folke/ts-comments.nvim",
     event = "VeryLazy",
     opts = {},
-  },
-  {
-    "nvim-mini/mini.pairs",
-    event = "VeryLazy",
-    opts = {
-      modes = { insert = true, command = true, terminal = false },
-      skip_next = [=[[%w%%%'%[%%"%.%`%$]]=],
-      skip_ts = { "string" },
-      skip_unbalanced = true,
-      markdown = true,
-    },
   },
   {
     "rachartier/tiny-inline-diagnostic.nvim",
@@ -119,7 +72,7 @@ return {
       { "<leader>Rb", desc = "Open scratchpad" },
     },
     opts = {
-      global_keymaps = false,
+      global_keymaps = true,
       global_keymaps_prefix = "<leader>R",
       kulala_keymaps_prefix = "",
     },
@@ -127,4 +80,53 @@ return {
   {
     "tpope/vim-sleuth",
   },
+  {
+    "tpope/vim-surround"
+  },
+  ---@type LazySpec
+  {
+    "mikavilpas/yazi.nvim",
+    version = "*", -- use the latest stable version
+    event = "VeryLazy",
+    dependencies = {
+      { "nvim-lua/plenary.nvim", lazy = true },
+    },
+    keys = {
+      -- 👇 in this section, choose your own keymappings!
+      {
+        "<leader>ef",
+        mode = { "n", "v" },
+        "<cmd>Yazi<cr>",
+        desc = "Open yazi at the current file",
+      },
+      {
+        -- Open in the current working directory
+        "<leader>ew",
+        "<cmd>Yazi cwd<cr>",
+        desc = "Open the file manager in nvim's working directory",
+      },
+      {
+        "<leader>ee",
+        "<cmd>Yazi toggle<cr>",
+        desc = "Resume the last yazi session",
+      },
+    },
+    ---@type YaziConfig | {}
+    opts = {
+      -- if you want to open yazi instead of netrw, see below for more info
+      open_for_directories = false,
+      keymaps = {
+        show_help = "<f1>",
+      },
+      highlight_hovered_buffers_in_same_directory = false
+    },
+    -- 👇 if you use `open_for_directories=true`, this is recommended
+    init = function()
+      -- mark netrw as loaded so it's not loaded at all.
+      --
+      -- More details: https://github.com/mikavilpas/yazi.nvim/issues/802
+      vim.g.loaded_netrwPlugin = 1
+    end,
+  }
+
 }

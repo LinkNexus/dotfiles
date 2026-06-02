@@ -5,17 +5,14 @@ return {
     dependencies = {
       "mason-org/mason.nvim",
       "mason-org/mason-lspconfig.nvim",
+      "folke/snacks.nvim",
     },
     config = function()
       -- Diagnostics
       local diagnostics = {
         underline = true,
         update_in_insert = false,
-        virtual_text = {
-          spacing = 4,
-          source = "if_many",
-          prefix = "●",
-        },
+        virtual_text = false,
         severity_sort = true,
         float = { border = "rounded", source = "if_many" },
         signs = {

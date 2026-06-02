@@ -150,3 +150,14 @@ bindkey -r '^S'
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export HOMEBREW_BUNDLE_FILE="$HOME/Brewfile"
+
+export DOTNET_ROOT=$(dirname $(readlink -f $(which dotnet)))
+export PATH="/Users/levynkeneng/.local/share/../bin:$PATH"
+
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	command yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+	command rm -f -- "$tmp"
+}

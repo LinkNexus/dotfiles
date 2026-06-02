@@ -1,5 +1,3 @@
-local api = vim.api
-
 local M = {}
 
 local state = {
@@ -11,23 +9,9 @@ local state = {
   },
 }
 
-local function default_root_dir(buf)
-  local bufname = api.nvim_buf_get_name(buf)
-  local dir = vim.fs.dirname(bufname)
-  local git_dir = vim.fs.find(".git", { upward = true, path = dir })[1]
-  if git_dir then
-    return vim.fs.dirname(git_dir)
-  end
-  return dir
-end
-
-local function session_key(root_dir)
-  return root_dir or ""
-end
-
 local function find_win_for_buf(bufnr)
-  for _, win in ipairs(api.nvim_tabpage_list_wins(0)) do
-    if api.nvim_win_get_buf(win) == bufnr then
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    if vim.api.nvim_win_get_buf(win) == bufnr then
       return win
     end
   end
@@ -38,18 +22,22 @@ local function session_paths(root_dir, suffix)
   local cache_dir = vim.fn.stdpath("cache")
   local safe_root = root_dir:gsub("[^%w%._-]", "_")
   local base = string.format("%s/powershell_es.%s.%s", cache_dir, safe_root, suffix)
-  return vim.fs.normalize(base .. ".session.json"), vim.fs.normalize(base .. ".log")
+  return vim.fs.normalize(base .. ".sesson.json"), vim.fs.normalize(base .. ".log")
 end
 
 local function read_session_details(path)
   local ok_read, data = pcall(vim.fn.readfile, path)
+
   if not ok_read then
     return nil
   end
+
   local ok_json, decoded = pcall(vim.json.decode, table.concat(data, "\n"))
+
   if not ok_json then
     return nil
   end
+
   pcall(vim.fn.delete, path)
   return decoded
 end
@@ -58,16 +46,17 @@ local function wait_for_session_file(path, cb)
   local function check(remaining)
     if vim.fn.filereadable(path) == 1 then
       local details = read_session_details(path)
+
       if details then
         cb(details, nil)
       else
-        cb(nil, "Could not parse PowerShell session details.")
+        cb(nil, "Could not parse Powershell session details")
       end
       return
     end
 
     if remaining <= 0 then
-      cb(nil, string.format("PowerShell session file not found: %s", path))
+      cb(nil, string.format("Powershell session file not found %s", path))
       return
     end
 
@@ -80,7 +69,9 @@ local function wait_for_session_file(path, cb)
 end
 
 local function build_cmd(config, opts)
-  local file = string.format("%s/PowerShellEditorServices/Start-EditorServices.ps1", config.bundle_path)
+  local file =
+    string.format("%s/PowerShellEditorServices/Start-EditorServices.ps1", config.bundle_path)
+
   local cmd = {
     config.shell,
     "-NoLogo",
@@ -93,7 +84,6 @@ local function build_cmd(config, opts)
     "-HostProfileId",
     "Neovim",
     "-HostVersion",
-    "1.0.0",
     "-LogPath",
     opts.log_path,
     "-LogLevel",
@@ -113,7 +103,7 @@ local function build_cmd(config, opts)
 
   if config.feature_flags and #config.feature_flags > 0 then
     table.insert(cmd, "-FeatureFlags")
-    table.insert(cmd, string.format("@(%s)", table.concat(config.feature_flags, ", ")))
+    table.insert(cmd, string.format("@(%s)", table.concat(config.feature_flags, ",")))
   end
 
   return cmd

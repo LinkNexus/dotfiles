@@ -5,14 +5,15 @@ local act = wezterm.action
 local is_darwin = wezterm.target_triple:find("darwin") ~= nil
 local is_windows = wezterm.target_triple:find("windows") ~= nil
 
-local font_name = "MonaspiceRn Nerd Font"
+local font_name = "MonaspiceNe Nerd Font"
 
 if is_windows then
 	config.default_prog = { "pwsh.exe" }
 end
 
 config.font = wezterm.font(font_name, { weight = "Medium" })
-config.font_size = is_darwin and 18.5 or 13
+config.font_size = is_darwin and 18.7 or 13
+config.cell_width = 0.87
 
 config.harfbuzz_features = { "ss01", "ss02", "ss03", "ss04", "ss05", "ss06", "ss07", "ss08", "ss09", "ss10", "liga" }
 config.line_height = 1.1
@@ -51,6 +52,8 @@ config.window_frame = {
 	active_titlebar_bg = "none",
 	inactive_titlebar_bg = "none",
 }
+
+config.tab_and_split_indices_are_zero_based = false
 
 config.colors = {
 	tab_bar = {
@@ -94,7 +97,7 @@ local function prompt_for_new_workspace(window, pane)
 	)
 end
 
-config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
+config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1500 }
 
 config.keys = {
 	{ key = "w", mods = "LEADER", action = act.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }) },
@@ -137,11 +140,11 @@ config.keys = {
 	{ key = ".", mods = "LEADER", action = act.MoveTabRelative(1) },
 }
 
-for i = 0, 9, 1 do
+for i = 1, 9, 1 do
 	table.insert(config.keys, {
 		key = "" .. i,
 		mods = "LEADER",
-		action = act.ActivateTab(i),
+		action = act.ActivateTab(i - 1),
 	})
 end
 

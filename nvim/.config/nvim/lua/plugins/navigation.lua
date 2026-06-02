@@ -16,49 +16,22 @@ return {
       })
     end,
     opts = {
-      file_ignore_patterns = {
-        "node_modules",
-        ".venv",
-        ".venv/lib",
-        "venv",
-        "site-packages",
-      },
-      ui_select = function(fzf_opts, items)
-        local function clamp_height(value)
-          return math.max(1, math.floor(value + 0.5))
-        end
-
-        return vim.tbl_deep_extend("force", fzf_opts, {
-          prompt = " ",
-          winopts = {
-            title = " " .. vim.trim((fzf_opts.prompt or "Select"):gsub("%s*:%s*$", "")) .. " ",
-            title_pos = "center",
-          },
-        }, fzf_opts.kind == "codeaction" and {
-          winopts = {
-            layout = "vertical",
-            height = clamp_height(math.min(vim.o.lines * 0.8 - 16, #items + 4)) + 16,
-            width = 0.5,
-            preview = {
-              layout = "vertical",
-              vertical = "down:15,border-top",
-            },
-          },
-        } or {
-          winopts = {
-            width = 0.5,
-            height = clamp_height(math.min(vim.o.lines * 0.8, #items + 4)),
-          },
-        })
-      end,
-      winopts = {
-        row = 0.5,
-      },
       files = {
         prompt = "❯ ",
         cwd_prompt = false,
         follow = true,
       },
+      previewers = {
+        builtin = {
+          extensions = {
+            ["png"]  = { "viu", "-b" },
+            ["jpg"]  = { "viu", "-b" },
+            ["jpeg"] = { "viu", "-b" },
+            ["gif"]  = { "viu", "-b" },
+            ["webp"] = { "viu", "-b" },
+          },
+        },
+      }
     },
     keys = {
       {
@@ -211,14 +184,14 @@ return {
         "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
         desc = "Buffer Diagnostics (Trouble)",
       },
-      { "<leader>cs", "<cmd>Trouble symbols toggle<cr>", desc = "Symbols (Trouble)" },
+      { "<leader>cs", "<cmd>Trouble symbols toggle<cr>",     desc = "Symbols (Trouble)" },
       {
         "<leader>cS",
         "<cmd>Trouble lsp toggle<cr>",
         desc = "LSP references/definitions/... (Trouble)",
       },
       { "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "Location List (Trouble)" },
-      { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", desc = "Quickfix List (Trouble)" },
+      { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>",  desc = "Quickfix List (Trouble)" },
       {
         "[q",
         function()
@@ -269,14 +242,23 @@ return {
         end,
         desc = "Previous Todo Comment",
       },
-      { "<leader>xt", "<cmd>Trouble todo toggle<cr>", desc = "Todo (Trouble)" },
+      { "<leader>xt", "<cmd>Trouble todo toggle<cr>",                desc = "Todo (Trouble)" },
       {
         "<leader>xT",
         "<cmd>Trouble todo toggle filter = {tag = {TODO,FIX,FIXME}}<cr>",
         desc = "Todo/Fix/Fixme (Trouble)",
       },
-      { "<leader>st", "<cmd>TodoFzfLua<cr>", desc = "Todo" },
+      { "<leader>st", "<cmd>TodoFzfLua<cr>",                         desc = "Todo" },
       { "<leader>sT", "<cmd>TodoFzfLua keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme" },
     },
+  },
+  {
+    "antosha417/nvim-lsp-file-operations",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    config = function()
+      require("lsp-file-operations").setup()
+    end,
   },
 }

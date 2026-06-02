@@ -1,18 +1,3 @@
-local function load_dashboard_banner()
-  local banner_path = vim.fn.stdpath('config') .. '/banner.txt'
-
-  if vim.fn.filereadable(banner_path) == 1 then
-    local banner_lines = vim.fn.readfile(banner_path)
-    if #banner_lines > 0 then
-      return banner_lines
-    end
-  end
-
-  return {
-    'NEOVIM',
-  }
-end
-
 return {
   {
     'nvim-lualine/lualine.nvim',
@@ -22,6 +7,7 @@ return {
         globalstatus = true,
         section_separators = { left = '', right = '' },
         component_separators = { left = '', right = '' },
+        disabled_filetypes = { statusline = { "snacks_dashboard" } },
       },
       sections = {
         lualine_a = {
@@ -97,21 +83,21 @@ return {
         {
           mode = { 'n', 'x' },
           { '<leader><tab>', group = 'tabs' },
-          { '<leader>n', group = 'notifications' },
-          { '<leader>c', group = 'code' },
-          { '<leader>d', group = 'debug' },
-          { '<leader>dp', group = 'profiler' },
-          { '<leader>f', group = 'file/find' },
-          { '<leader>t', group = 'test' },
-          { '<leader>q', group = 'quit/session' },
-          { '<leader>g', group = 'git' },
-          { '<leader>gh', group = 'hunks' },
-          { '<leader>gP', group = 'pull requests' },
-          { '[', group = 'prev' },
-          { ']', group = 'next' },
-          { 'g', group = 'goto' },
-          { 'gs', group = 'surround' },
-          { 'z', group = 'fold' },
+          { '<leader>n',     group = 'notifications' },
+          { '<leader>c',     group = 'code' },
+          { '<leader>d',     group = 'debug' },
+          { '<leader>dp',    group = 'profiler' },
+          { '<leader>f',     group = 'file/find' },
+          { '<leader>t',     group = 'test' },
+          { '<leader>q',     group = 'quit/session' },
+          { '<leader>g',     group = 'git' },
+          { '<leader>gh',    group = 'hunks' },
+          { '<leader>gP',    group = 'pull requests' },
+          { '[',             group = 'prev' },
+          { ']',             group = 'next' },
+          { 'g',             group = 'goto' },
+          { 'gs',            group = 'surround' },
+          { 'z',             group = 'fold' },
           {
             '<leader>b',
             group = 'buffer',
@@ -128,7 +114,7 @@ return {
               return require('which-key.extras').expand.win()
             end,
           },
-          { 'gx', desc = 'Open with system app' },
+          { 'gx',        desc = 'Open with system app' },
         },
       },
     },
@@ -141,18 +127,6 @@ return {
         desc = 'Buffer Local Keymaps (which-key)',
       },
     },
-  },
-  {
-    'nvimdev/dashboard-nvim',
-    event = 'VimEnter',
-    opts = {
-      theme = 'doom',
-      config = {
-        header = load_dashboard_banner(),
-        center = {},
-      },
-    },
-    dependencies = { { 'nvim-tree/nvim-web-devicons' } },
   },
   {
     'folke/noice.nvim',
@@ -223,4 +197,18 @@ return {
       end
     end,
   },
+  {
+    "f-person/auto-dark-mode.nvim",
+    opts = {
+      set_dark_mode = function()
+        vim.cmd.colorscheme("carbonfox")
+        vim.api.nvim_set_option_value("background", "dark", {})
+      end,
+      set_light_mode = function()
+        vim.cmd.colorscheme("dayfox")
+        vim.api.nvim_set_option_value("background", "light", {})
+      end,
+      update_interval = 3000
+    }
+  }
 }

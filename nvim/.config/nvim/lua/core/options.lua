@@ -37,6 +37,13 @@ vim.opt.foldlevelstart = 99
 vim.opt.foldenable = true
 
 vim.opt.autoread = true
+vim.opt.laststatus = 3
+
+vim.opt.swapfile = false
+vim.opt.backup = false
+vim.opt.scrolloff = 10
+
+vim.opt.completeopt = "menuone,noselect,fuzzy,nosort"
 
 -- vim.g.loaded_netrw = 1
 -- vim.g.loaded_netrwPlugin = 1

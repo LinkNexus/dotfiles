@@ -13,14 +13,14 @@ return {
   },
   {
     "EdenEast/nightfox.nvim",
-    lazy = true,
+    lazy = false,
     opts = {
       options = {
-        transparent = true,
+        -- transparent = true,
         styles = {
-          -- comments = "italic",
+          comments = "italic",
           constants = "bold",
-          -- keywords = "italic",
+          keywords = "italic",
           types = "bold",
           -- strings = "italic",
           functions = "bold",
