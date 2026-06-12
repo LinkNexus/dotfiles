@@ -1,7 +1,7 @@
 return {
   {
     "ibhagwan/fzf-lua",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = { "nvim-tree/nvim-web-devicons", "folke/snacks.nvim" },
     init = function()
       vim.api.nvim_create_autocmd("User", {
         pattern = "VeryLazy",
@@ -21,17 +21,6 @@ return {
         cwd_prompt = false,
         follow = true,
       },
-      previewers = {
-        builtin = {
-          extensions = {
-            ["png"]  = { "viu", "-b" },
-            ["jpg"]  = { "viu", "-b" },
-            ["jpeg"] = { "viu", "-b" },
-            ["gif"]  = { "viu", "-b" },
-            ["webp"] = { "viu", "-b" },
-          },
-        },
-      }
     },
     keys = {
       {

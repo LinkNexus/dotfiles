@@ -18,9 +18,9 @@ return {
       options = {
         -- transparent = true,
         styles = {
-          comments = "italic",
+          -- comments = "italic",
           constants = "bold",
-          keywords = "italic",
+          -- keywords = "italic",
           types = "bold",
           -- strings = "italic",
           functions = "bold",

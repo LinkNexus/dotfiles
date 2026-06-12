@@ -6,6 +6,7 @@ return {
       'saghen/blink.lib',
       "folke/lazydev.nvim",
       'rafamadriz/friendly-snippets',
+      "fang2hou/blink-copilot"
     },
     build = function()
       -- build the fuzzy matcher, optionally add a timeout to `pwait(timeout_ms)`
@@ -49,8 +50,17 @@ return {
       },
 
       sources = {
-        default = { "lsp", "path", "snippets", "buffer", "lazydev" },
+        default = { "lsp", "path", "snippets", "buffer", "lazydev", "copilot" },
+        per_filetype = {
+          codecompanion = { "codecompanion" },
+        },
         providers = {
+          copilot = {
+            name = "copilot",
+            module = "blink-copilot",
+            score_offset = 100,
+            async = true,
+          },
           lazydev = {
             name = "LazyDev",
             module = "lazydev.integrations.blink",

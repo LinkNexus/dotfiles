@@ -38,4 +38,45 @@ return {
       require("ibl").setup(opts)
     end
   },
+  {
+    "zbirenbaum/copilot.lua",
+    dependencies = {
+      "copilotlsp-nvim/copilot-lsp", -- (optional) for NES functionality
+    },
+    cmd = "Copilot",
+    event = "InsertEnter",
+    config = function()
+      require("copilot").setup({})
+    end,
+  },
+  {
+    "olimorris/codecompanion.nvim",
+    version = "^1948B6-8B13.0.0",
+    opts = {
+      log_level = "DEBUG",
+      interactions = {
+        chat = {
+          adapter = "copilot_acp"
+        },
+        cli = {
+          agent = "copilot",
+          agents = {
+            copilot = {
+              cmd = "copilot",
+              args = {},
+              description = "Code Companion CLI using Copilot",
+              provider = "terminal"
+            }
+          }
+        }
+      }
+    },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+    },
+    config = function(_, opts)
+      require("codecompanion").setup(opts)
+    end,
+  },
 }
