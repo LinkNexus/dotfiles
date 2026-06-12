@@ -152,7 +152,7 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export HOMEBREW_BUNDLE_FILE="$HOME/Brewfile"
 
 export DOTNET_ROOT=$(dirname $(readlink -f $(which dotnet)))
-export PATH="/Users/levynkeneng/.local/share/../bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.dotnet/tools:$PATH"
 
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
