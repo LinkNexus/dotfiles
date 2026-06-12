@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# macOS
+if [[ "$(uname)" == "Darwin" ]]; then
+  defaults read -g AppleInterfaceStyle 2>/dev/null | grep -q Dark && echo dark || echo light
+  exit
+fi
+
+# KDE (Linux)
+bg=$(kreadconfig6 --file kdeglobals --group "Colors:Window" --key "BackgroundNormal" 2>/dev/null)
+r=$(echo "$bg" | cut -d',' -f1)
+[[ -n "$r" && "$r" -lt 128 ]] && echo dark || echo light

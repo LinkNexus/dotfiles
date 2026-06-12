@@ -38,4 +38,10 @@ return {
       require("ibl").setup(opts)
     end
   },
+  {
+    'stevearc/overseer.nvim',
+    ---@module 'overseer'
+    ---@type overseer.SetupOpts
+    opts = {},
+  }
 }

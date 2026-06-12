@@ -108,9 +108,9 @@ fi
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-if [[ "$(uname)" == "Linux" ]]; then
-  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-fi
+# if [[ "$(uname)" == "Linux" ]]; then
+#   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# fi
 
 source <(fzf --zsh)
 eval "$(zoxide init zsh --cmd cd)"
@@ -152,7 +152,7 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export HOMEBREW_BUNDLE_FILE="$HOME/Brewfile"
 
 export DOTNET_ROOT=$(dirname $(readlink -f $(which dotnet)))
-export PATH="/Users/levynkeneng/.local/share/../bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
