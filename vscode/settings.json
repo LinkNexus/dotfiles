@@ -52,5 +52,6 @@
   },
   "workbench.iconTheme": "vscode-icons",
   "python.analysis.typeCheckingMode": "standard",
-  "workbench.colorTheme": "Carbonfox"
+  "workbench.colorTheme": "Carbonfox",
+  "claudeCode.preferredLocation": "panel"
 }

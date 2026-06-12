@@ -29,6 +29,7 @@ return {
     ---@type snacks.Config
     opts = {
       lazygit = { enabled = true },
+      image = { enabled = true },
       dashboard = {
         preset = {
           header = table.concat(banner_lines, "\n")
@@ -37,7 +38,7 @@ return {
           {
             section = "terminal",
             cmd = dashboard_cmd,
-            height = 20,
+            height = 18,
             padding = 1,
           },
           {
