@@ -43,7 +43,8 @@ return {
     ---@module 'overseer'
     ---@type overseer.SetupOpts
     opts = {},
-  }
+  },
+  {
     "zbirenbaum/copilot.lua",
     dependencies = {
       "copilotlsp-nvim/copilot-lsp", -- (optional) for NES functionality
@@ -51,7 +52,11 @@ return {
     cmd = "Copilot",
     event = "InsertEnter",
     config = function()
-      require("copilot").setup({})
+      require("copilot").setup({
+        nes = {
+          enabled = false
+        }
+      })
     end,
   },
   {
