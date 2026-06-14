@@ -154,6 +154,7 @@ export HOMEBREW_BUNDLE_FILE="$HOME/Brewfile"
 export DOTNET_ROOT=$(dirname $(readlink -f $(which dotnet)))
 export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 export PATH="$HOME/.local/bin:$HOME/.dotnet/tools:$PATH"
+export PATH="/Users/levynkeneng/.bun/bin:$PATH"
 
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
