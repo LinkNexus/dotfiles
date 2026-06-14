@@ -277,6 +277,14 @@ return {
           },
           justMyCode = true,
         },
+        {
+          type = "coreclr",
+          name = "ATTACH to running app in dedicated terminal",
+          request = "attach",
+          processId = function()
+            return require("dap.utils").pick_process()
+          end,
+        }
       }
 
       pcall(function()
