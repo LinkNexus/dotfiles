@@ -116,7 +116,7 @@ source <(fzf --zsh)
 eval "$(zoxide init zsh --cmd cd)"
 
 
-eval "$(starship init zsh)"
+# eval "$(starship init zsh)"
 
 alias n="nvim"
 alias ls='eza --icons'
