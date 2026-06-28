@@ -1,6 +1,6 @@
 -- require("vim._core.ui2").enable({})
 
-require("utils.theme")
+require("utils")
 require("core")
 require("core.lazy")
 
