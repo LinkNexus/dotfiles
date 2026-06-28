@@ -1,3 +1,6 @@
 [submodule "nix"]
 	path = nix
 	url = git@github.com:LinkNexus/nix-config.git
+[submodule "nvim"]
+	path = nvim
+	url = git@github.com:LinkNexus/nvim-config.git
