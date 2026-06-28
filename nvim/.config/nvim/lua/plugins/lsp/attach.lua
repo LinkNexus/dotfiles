@@ -141,7 +141,7 @@ local function call_hierarchy(kind)
   end
 
   local method = kind == "incoming" and "callHierarchy/incomingCalls"
-    or "callHierarchy/outgoingCalls"
+      or "callHierarchy/outgoingCalls"
   local params = vim.lsp.util.make_position_params(0, "utf-16")
 
   vim.lsp.buf_request(0, "textDocument/prepareCallHierarchy", params, function(err, result)
@@ -221,18 +221,23 @@ local function register_mappings()
   set("n", "gd", lsp_definitions, { desc = "Goto Definition", lsp = { method = "textDocument/definition" } })
   set("n", "gr", lsp_references, { desc = "References", lsp = { method = "textDocument/references" } })
   set("n", "gI", lsp_implementations, { desc = "Goto Implementation", lsp = { method = "textDocument/implementation" } })
-  set("n", "gy", lsp_type_definitions, { desc = "Goto Type Definition", lsp = { method = "textDocument/typeDefinition" } })
+  set("n", "gy", lsp_type_definitions,
+    { desc = "Goto Type Definition", lsp = { method = "textDocument/typeDefinition" } })
   set("n", "gD", vim.lsp.buf.declaration, { desc = "Goto Declaration", lsp = { method = "textDocument/declaration" } })
 
   -- Hover / signature
   set("n", "K", vim.lsp.buf.hover, { desc = "Hover", lsp = { method = "textDocument/hover" } })
   set("n", "gK", vim.lsp.buf.signature_help, { desc = "Signature Help", lsp = { method = "textDocument/signatureHelp" } })
-  set("i", "<C-k>", vim.lsp.buf.signature_help, { desc = "Signature Help", lsp = { method = "textDocument/signatureHelp" } })
+  set("i", "<C-k>", vim.lsp.buf.signature_help,
+    { desc = "Signature Help", lsp = { method = "textDocument/signatureHelp" } })
 
   -- Code actions / codelens / rename / organize
-  set({ "n", "x" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action", lsp = { method = "textDocument/codeAction" } })
-  set({ "n", "x" }, "<leader>cc", vim.lsp.codelens.run, { desc = "Run Codelens", lsp = { method = "textDocument/codeLens" } })
-  set("n", "<leader>cC", vim.lsp.codelens.refresh, { desc = "Refresh & Display Codelens", lsp = { method = "textDocument/codeLens" } })
+  set({ "n", "x" }, "<leader>ca", vim.lsp.buf.code_action,
+    { desc = "Code Action", lsp = { method = "textDocument/codeAction" } })
+  set({ "n", "x" }, "<leader>cc", vim.lsp.codelens.run,
+    { desc = "Run Codelens", lsp = { method = "textDocument/codeLens" } })
+  set("n", "<leader>cC", vim.lsp.codelens.refresh,
+    { desc = "Refresh & Display Codelens", lsp = { method = "textDocument/codeLens" } })
   set("n", "<leader>cR", rename_current_file, { desc = "Rename File", enabled = lsp_enabled })
   set("n", "<leader>cr", vim.lsp.buf.rename, { desc = "Rename", lsp = { method = "textDocument/rename" } })
   set("n", "<leader>cA", function()
@@ -247,8 +252,10 @@ local function register_mappings()
   set("n", "<leader>sS", lsp_workspace_symbols, { desc = "LSP Workspace Symbols", lsp = { method = "workspace/symbol" } })
 
   -- Call hierarchy
-  set("n", "gai", function() call_hierarchy("incoming") end, { desc = "Calls Incoming", lsp = { method = "callHierarchy/prepare" } })
-  set("n", "gao", function() call_hierarchy("outgoing") end, { desc = "Calls Outgoing", lsp = { method = "callHierarchy/prepare" } })
+  set("n", "gai", function() call_hierarchy("incoming") end,
+    { desc = "Calls Incoming", lsp = { method = "callHierarchy/prepare" } })
+  set("n", "gao", function() call_hierarchy("outgoing") end,
+    { desc = "Calls Outgoing", lsp = { method = "callHierarchy/prepare" } })
 
   -- Reference jumping (only in buffers with LSP attached)
   local ref_opts = { desc = "Next Reference", enabled = lsp_enabled }
@@ -298,49 +305,59 @@ local function register_mappings()
 
   local mappings = {
     -- basic info
-    { mode = "n", lhs = "<leader>cl", rhs = "<cmd>LspInfo<cr>", opts = { desc = "Lsp Info", enabled = lsp_enabled } },
+    { mode = "n",          lhs = "<leader>cl", rhs = "<cmd>LspInfo<cr>",                           opts = { desc = "Lsp Info", enabled = lsp_enabled } },
 
     -- definitions / references / implementations / types
-    { mode = "n", lhs = "gd", rhs = lsp_definitions, opts = { desc = "Goto Definition", lsp = { method = "textDocument/definition" } } },
-    { mode = "n", lhs = "gr", rhs = lsp_references, opts = { desc = "References", lsp = { method = "textDocument/references" } } },
-    { mode = "n", lhs = "gI", rhs = lsp_implementations, opts = { desc = "Goto Implementation", lsp = { method = "textDocument/implementation" } } },
-    { mode = "n", lhs = "gy", rhs = lsp_type_definitions, opts = { desc = "Goto Type Definition", lsp = { method = "textDocument/typeDefinition" } } },
-    { mode = "n", lhs = "gD", rhs = vim.lsp.buf.declaration, opts = { desc = "Goto Declaration", lsp = { method = "textDocument/declaration" } } },
+    { mode = "n",          lhs = "gd",         rhs = lsp_definitions,                              opts = { desc = "Goto Definition", lsp = { method = "textDocument/definition" } } },
+    { mode = "n",          lhs = "gr",         rhs = lsp_references,                               opts = { desc = "References", lsp = { method = "textDocument/references" } } },
+    { mode = "n",          lhs = "gI",         rhs = lsp_implementations,                          opts = { desc = "Goto Implementation", lsp = { method = "textDocument/implementation" } } },
+    { mode = "n",          lhs = "gy",         rhs = lsp_type_definitions,                         opts = { desc = "Goto Type Definition", lsp = { method = "textDocument/typeDefinition" } } },
+    { mode = "n",          lhs = "gD",         rhs = vim.lsp.buf.declaration,                      opts = { desc = "Goto Declaration", lsp = { method = "textDocument/declaration" } } },
 
     -- hover / signature
-    { mode = "n", lhs = "K", rhs = vim.lsp.buf.hover, opts = { desc = "Hover", lsp = { method = "textDocument/hover" } } },
-    { mode = "n", lhs = "gK", rhs = vim.lsp.buf.signature_help, opts = { desc = "Signature Help", lsp = { method = "textDocument/signatureHelp" } } },
-    { mode = "i", lhs = "<C-k>", rhs = vim.lsp.buf.signature_help, opts = { desc = "Signature Help", lsp = { method = "textDocument/signatureHelp" } } },
+    { mode = "n",          lhs = "K",          rhs = vim.lsp.buf.hover,                            opts = { desc = "Hover", lsp = { method = "textDocument/hover" } } },
+    { mode = "n",          lhs = "gK",         rhs = vim.lsp.buf.signature_help,                   opts = { desc = "Signature Help", lsp = { method = "textDocument/signatureHelp" } } },
+    { mode = "i",          lhs = "<C-k>",      rhs = vim.lsp.buf.signature_help,                   opts = { desc = "Signature Help", lsp = { method = "textDocument/signatureHelp" } } },
 
     -- code actions / codelens / rename / organize
-    { mode = { "n", "x" }, lhs = "<leader>ca", rhs = vim.lsp.buf.code_action, opts = { desc = "Code Action", lsp = { method = "textDocument/codeAction" } } },
-    { mode = { "n", "x" }, lhs = "<leader>cc", rhs = vim.lsp.codelens.run, opts = { desc = "Run Codelens", lsp = { method = "textDocument/codeLens" } } },
-    { mode = "n", lhs = "<leader>cC", rhs = vim.lsp.codelens.refresh, opts = { desc = "Refresh & Display Codelens", lsp = { method = "textDocument/codeLens" } } },
-    { mode = "n", lhs = "<leader>cR", rhs = rename_current_file, opts = { desc = "Rename File", enabled = lsp_enabled } },
-    { mode = "n", lhs = "<leader>cr", rhs = vim.lsp.buf.rename, opts = { desc = "Rename", lsp = { method = "textDocument/rename" } } },
-    { mode = "n", lhs = "<leader>cA", rhs = function()
+    { mode = { "n", "x" }, lhs = "<leader>ca", rhs = vim.lsp.buf.code_action,                      opts = { desc = "Code Action", lsp = { method = "textDocument/codeAction" } } },
+    { mode = { "n", "x" }, lhs = "<leader>cc", rhs = vim.lsp.codelens.run,                         opts = { desc = "Run Codelens", lsp = { method = "textDocument/codeLens" } } },
+    { mode = "n",          lhs = "<leader>cC", rhs = function() vim.lsp.codelens.enable(true) end, opts = { desc = "Refresh & Display Codelens", lsp = { method = "textDocument/codeLens" } } },
+    { mode = "n",          lhs = "<leader>cR", rhs = rename_current_file,                          opts = { desc = "Rename File", enabled = lsp_enabled } },
+    { mode = "n",          lhs = "<leader>cr", rhs = vim.lsp.buf.rename,                           opts = { desc = "Rename", lsp = { method = "textDocument/rename" } } },
+    {
+      mode = "n",
+      lhs = "<leader>cA",
+      rhs = function()
         vim.lsp.buf.code_action({ context = { only = { "source" }, diagnostics = {} } })
-      end, opts = { desc = "Source Action", lsp = { method = "textDocument/codeAction" } } },
-    { mode = "n", lhs = "<leader>co", rhs = function()
+      end,
+      opts = { desc = "Source Action", lsp = { method = "textDocument/codeAction" } }
+    },
+    {
+      mode = "n",
+      lhs = "<leader>co",
+      rhs = function()
         vim.lsp.buf.code_action({ apply = true, context = { only = { "source.organizeImports" }, diagnostics = {} } })
-      end, opts = { desc = "Organize Imports", lsp = { method = "textDocument/codeAction" } } },
+      end,
+      opts = { desc = "Organize Imports", lsp = { method = "textDocument/codeAction" } }
+    },
 
     -- symbols / workspace symbols
-    { mode = "n", lhs = "<leader>ss", rhs = lsp_document_symbols, opts = { desc = "LSP Symbols", lsp = { method = "textDocument/documentSymbol" } } },
-    { mode = "n", lhs = "<leader>sS", rhs = lsp_workspace_symbols, opts = { desc = "LSP Workspace Symbols", lsp = { method = "workspace/symbol" } } },
+    { mode = "n", lhs = "<leader>ss", rhs = lsp_document_symbols,                      opts = { desc = "LSP Symbols", lsp = { method = "textDocument/documentSymbol" } } },
+    { mode = "n", lhs = "<leader>sS", rhs = lsp_workspace_symbols,                     opts = { desc = "LSP Workspace Symbols", lsp = { method = "workspace/symbol" } } },
 
     -- call hierarchy
-    { mode = "n", lhs = "gai", rhs = function() call_hierarchy("incoming") end, opts = { desc = "Calls Incoming", lsp = { method = "callHierarchy/prepare" } } },
-    { mode = "n", lhs = "gao", rhs = function() call_hierarchy("outgoing") end, opts = { desc = "Calls Outgoing", lsp = { method = "callHierarchy/prepare" } } },
+    { mode = "n", lhs = "gai",        rhs = function() call_hierarchy("incoming") end, opts = { desc = "Calls Incoming", lsp = { method = "callHierarchy/prepare" } } },
+    { mode = "n", lhs = "gao",        rhs = function() call_hierarchy("outgoing") end, opts = { desc = "Calls Outgoing", lsp = { method = "callHierarchy/prepare" } } },
 
     -- reference jumping (enabled only when LSP attached)
-    { mode = "n", lhs = "]]", rhs = function() jump_reference(true) end, opts = { desc = "Next Reference", enabled = lsp_enabled } },
-    { mode = "n", lhs = "[[", rhs = function() jump_reference(false) end, opts = { desc = "Prev Reference", enabled = lsp_enabled } },
-    { mode = "n", lhs = "<A-n>", rhs = function() jump_reference(true) end, opts = { desc = "Next Reference", enabled = lsp_enabled } },
-    { mode = "n", lhs = "<A-p>", rhs = function() jump_reference(false) end, opts = { desc = "Prev Reference", enabled = lsp_enabled } },
+    { mode = "n", lhs = "]]",         rhs = function() jump_reference(true) end,       opts = { desc = "Next Reference", enabled = lsp_enabled } },
+    { mode = "n", lhs = "[[",         rhs = function() jump_reference(false) end,      opts = { desc = "Prev Reference", enabled = lsp_enabled } },
+    { mode = "n", lhs = "<A-n>",      rhs = function() jump_reference(true) end,       opts = { desc = "Next Reference", enabled = lsp_enabled } },
+    { mode = "n", lhs = "<A-p>",      rhs = function() jump_reference(false) end,      opts = { desc = "Prev Reference", enabled = lsp_enabled } },
 
     -- diagnostics
-    { mode = "n", lhs = "<leader>cd", rhs = vim.diagnostic.open_float, opts = { desc = "Line Diagnostics", enabled = lsp_enabled } },
+    { mode = "n", lhs = "<leader>cd", rhs = vim.diagnostic.open_float,                 opts = { desc = "Line Diagnostics", enabled = lsp_enabled } },
   }
 
   -- diagnostics jump helpers
@@ -357,20 +374,31 @@ local function register_mappings()
     end
   end
 
-  table.insert(mappings, { mode = "n", lhs = "]d", rhs = diag_jump(true, nil), opts = { desc = "Next Diagnostic", enabled = lsp_enabled } })
-  table.insert(mappings, { mode = "n", lhs = "[d", rhs = diag_jump(false, nil), opts = { desc = "Prev Diagnostic", enabled = lsp_enabled } })
-  table.insert(mappings, { mode = "n", lhs = "]e", rhs = diag_jump(true, vim.diagnostic.severity.ERROR), opts = { desc = "Next Error", enabled = lsp_enabled } })
-  table.insert(mappings, { mode = "n", lhs = "[e", rhs = diag_jump(false, vim.diagnostic.severity.ERROR), opts = { desc = "Prev Error", enabled = lsp_enabled } })
-  table.insert(mappings, { mode = "n", lhs = "]w", rhs = diag_jump(true, vim.diagnostic.severity.WARN), opts = { desc = "Next Warning", enabled = lsp_enabled } })
-  table.insert(mappings, { mode = "n", lhs = "[w", rhs = diag_jump(false, vim.diagnostic.severity.WARN), opts = { desc = "Prev Warning", enabled = lsp_enabled } })
+  table.insert(mappings,
+    { mode = "n", lhs = "]d", rhs = diag_jump(true, nil), opts = { desc = "Next Diagnostic", enabled = lsp_enabled } })
+  table.insert(mappings,
+    { mode = "n", lhs = "[d", rhs = diag_jump(false, nil), opts = { desc = "Prev Diagnostic", enabled = lsp_enabled } })
+  table.insert(mappings,
+    { mode = "n", lhs = "]e", rhs = diag_jump(true, vim.diagnostic.severity.ERROR), opts = { desc = "Next Error", enabled = lsp_enabled } })
+  table.insert(mappings,
+    { mode = "n", lhs = "[e", rhs = diag_jump(false, vim.diagnostic.severity.ERROR), opts = { desc = "Prev Error", enabled = lsp_enabled } })
+  table.insert(mappings,
+    { mode = "n", lhs = "]w", rhs = diag_jump(true, vim.diagnostic.severity.WARN), opts = { desc = "Next Warning", enabled = lsp_enabled } })
+  table.insert(mappings,
+    { mode = "n", lhs = "[w", rhs = diag_jump(false, vim.diagnostic.severity.WARN), opts = { desc = "Prev Warning", enabled = lsp_enabled } })
 
   -- inlay hints toggle if available
   if vim.lsp.inlay_hint and vim.lsp.inlay_hint.enable and vim.lsp.inlay_hint.is_enabled then
-    table.insert(mappings, { mode = "n", lhs = "<leader>uh", rhs = function()
-      local bufnr = vim.api.nvim_get_current_buf()
-      local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr })
-      vim.lsp.inlay_hint.enable(not enabled, { bufnr = bufnr })
-    end, opts = { desc = "Toggle Inlay Hints", enabled = lsp_enabled } })
+    table.insert(mappings, {
+      mode = "n",
+      lhs = "<leader>uh",
+      rhs = function()
+        local bufnr = vim.api.nvim_get_current_buf()
+        local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr })
+        vim.lsp.inlay_hint.enable(not enabled, { bufnr = bufnr })
+      end,
+      opts = { desc = "Toggle Inlay Hints", enabled = lsp_enabled }
+    })
   end
 
   for _, m in ipairs(mappings) do
@@ -435,7 +463,8 @@ function M.setup(settings)
               return
             end
             vim.b[bufnr].clangd_fix_on_save = not vim.b[bufnr].clangd_fix_on_save
-            vim.notify(("clangd fix-on-save %s"):format(vim.b[bufnr].clangd_fix_on_save and "enabled" or "disabled"), vim.log.levels.INFO)
+            vim.notify(("clangd fix-on-save %s"):format(vim.b[bufnr].clangd_fix_on_save and "enabled" or "disabled"),
+              vim.log.levels.INFO)
           end
 
           if snacks_ok and Snacks and Snacks.toggle and Snacks.toggle.new then
@@ -460,11 +489,11 @@ function M.setup(settings)
         end
       end
 
-      if settings.codelens.enabled and vim.lsp.codelens and vim.lsp.codelens.refresh then
-        vim.lsp.codelens.refresh()
+      if settings.codelens.enabled and vim.lsp.codelens and vim.lsp.codelens.enable then
+        vim.lsp.codelens.enable(true)
         vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
           buffer = bufnr,
-          callback = vim.lsp.codelens.refresh,
+          callback = function() vim.lsp.codelens.enable(true) end,
         })
       end
 

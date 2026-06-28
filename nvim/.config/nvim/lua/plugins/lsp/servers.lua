@@ -111,6 +111,10 @@ function M.setup(capabilities)
       }
     },
     biome = {},
+    tailwindcss = {},
+    docker_compose_language_service = {},
+    docker_language_server = {},
+    dockerls = {},
   }
 
   local other_servers = {
