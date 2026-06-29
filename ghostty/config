@@ -1,4 +1,4 @@
-font-family = CommitMono Nerd Font
+font-family = MonaspiceRn Nerd Font Mono
 font-feature = "ss01"
 font-feature = "ss02"
 font-feature = "ss03"
@@ -10,7 +10,7 @@ font-feature = "ss08"
 font-feature = "ss09"
 font-feature = "ss10"
 font-feature = "liga"
-font-size = 18.5
+font-size = 19
 # background-opacity = 0.7
 # background-blur = 8
 custom-shader = shaders/cursor_trail.glsl
