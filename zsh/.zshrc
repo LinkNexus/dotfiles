@@ -1,4 +1,4 @@
-export PATH="$HOME/.local/share/nvim/mason/bin:/opt/homebrew/bin:$PATH"
+export PATH="$HOME/.local/share/nvim/mason/bin:/opt/homebrew/bin:$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.dotnet/tools:$HOME/dotfiles/scripts:$HOME/.bun/bin:$PATH"
 
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -116,7 +116,7 @@ source <(fzf --zsh)
 eval "$(zoxide init zsh --cmd cd)"
 
 
-# eval "$(starship init zsh)"
+eval "$(starship init zsh)"
 
 alias n="nvim"
 alias ls='eza --icons'
@@ -143,18 +143,14 @@ _dotnet_zsh_complete()
 
 compdef _dotnet_zsh_complete dotnet
 
-# export KITTY_CONFIG_DIRECTORY=$HOME/.config/kitty
-
 stty -ixon
 bindkey -r '^S'
+
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export HOMEBREW_BUNDLE_FILE="$HOME/Brewfile"
 
 export DOTNET_ROOT=$(dirname $(readlink -f $(which dotnet)))
-export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
-export PATH="$HOME/.local/bin:$HOME/.dotnet/tools:$PATH"
-export PATH="/Users/levynkeneng/.bun/bin:$PATH"
 
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
