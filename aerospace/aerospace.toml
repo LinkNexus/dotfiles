@@ -1,0 +1,150 @@
+# ~/.aerospace.toml
+# Leader chord = Cmd+Alt held together (closest macOS equivalent to
+# Hyprland's dedicated SUPER key — Cmd alone is too overloaded by apps).
+
+# Required as of AeroSpace v2 — omitting this falls back to
+# config-version = 1 (older, deprecated behavior). See:
+# https://nikitabobko.github.io/AeroSpace/guide#config-version
+config-version = 2
+
+start-at-login = true
+accordion-padding = 30
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+automatically-unhide-macos-hidden-apps = true
+
+# Under config-version 1 this was inferred automatically from your
+# keybindings; under v2 it must be explicit if you want workspaces
+# 1-9 to persist even when empty (e.g. so workspace 1 doesn't
+# disappear from the list when you close everything on it).
+persistent-workspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
+after-startup-command = ['exec-and-forget sketchybar', 'exec-and-forget borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0']
+exec-on-workspace-change = ['/bin/bash', '-c', 'sketchybar --trigger aerospace_workspace_change']
+
+[gaps]
+inner.horizontal = 8
+inner.vertical = 8
+outer.left = 8
+outer.bottom = 8
+outer.top = 8
+outer.right = 8
+
+# ─── Main mode (always active) ───────────────────────────────
+[mode.main.binding]
+
+# Focus a window (leader + hjkl, vim-style directions)
+alt-cmd-h = 'focus left'
+alt-cmd-j = 'focus down'
+alt-cmd-k = 'focus up'
+alt-cmd-l = 'focus right'
+
+# Move a window within the tree
+alt-cmd-shift-h = 'move left'
+alt-cmd-shift-j = 'move down'
+alt-cmd-shift-k = 'move up'
+alt-cmd-shift-l = 'move right'
+
+# Resize focused window
+alt-cmd-minus = 'resize smart -50'
+alt-cmd-equal = 'resize smart +50'
+
+# Layout controls
+alt-cmd-slash = 'layout tiles horizontal vertical'   # toggle split direction
+alt-cmd-comma = 'layout accordion horizontal vertical' # toggle accordion mode
+alt-cmd-f     = 'layout floating tiling'              # float/tile current window
+alt-cmd-r     = 'flatten-workspace-tree'              # reset a messy layout
+alt-cmd-enter = 'fullscreen'
+
+# Switch to workspace 1-9
+alt-cmd-1 = 'workspace 1'
+alt-cmd-2 = 'workspace 2'
+alt-cmd-3 = 'workspace 3'
+alt-cmd-4 = 'workspace 4'
+alt-cmd-5 = 'workspace 5'
+alt-cmd-6 = 'workspace 6'
+alt-cmd-7 = 'workspace 7'
+alt-cmd-8 = 'workspace 8'
+alt-cmd-9 = 'workspace 9'
+
+# Send focused window to workspace 1-9 (and follow it there)
+alt-cmd-shift-1 = ['move-node-to-workspace 1', 'workspace 1']
+alt-cmd-shift-2 = ['move-node-to-workspace 2', 'workspace 2']
+alt-cmd-shift-3 = ['move-node-to-workspace 3', 'workspace 3']
+alt-cmd-shift-4 = ['move-node-to-workspace 4', 'workspace 4']
+alt-cmd-shift-5 = ['move-node-to-workspace 5', 'workspace 5']
+alt-cmd-shift-6 = ['move-node-to-workspace 6', 'workspace 6']
+alt-cmd-shift-7 = ['move-node-to-workspace 7', 'workspace 7']
+alt-cmd-shift-8 = ['move-node-to-workspace 8', 'workspace 8']
+alt-cmd-shift-9 = ['move-node-to-workspace 9', 'workspace 9']
+
+# Move current workspace to the other monitor
+alt-cmd-tab = 'move-workspace-to-monitor --wrap-around next'
+
+# Bounce back to whichever workspace you were just on (like
+# Hyprland's "toggle special workspace" — great for a quick
+# detour and back)
+alt-cmd-backtick = 'workspace-back-and-forth'
+
+# Reload config on the fly
+alt-cmd-shift-c = 'reload-config'
+
+alt-cmd-e = 'exec-and-forget open -a Finder'
+alt-cmd-b = 'exec-and-forget open -a Zen'
+alt-cmd-m = 'exec-and-forget open -a Thunderbird'
+alt-cmd-i = 'exec-and-forget kitty-scratch-toggle'
+
+# Enter "service" mode for less-frequent commands
+alt-cmd-shift-semicolon = 'mode service'
+
+# ─── Service mode (temporary, exits after one command) ───────
+[mode.service.binding]
+esc       = ['reload-config', 'mode main']
+r         = ['flatten-workspace-tree', 'mode main']   # reset layout
+f         = ['layout floating tiling', 'mode main']
+backspace = ['close-all-windows-but-current', 'mode main']
+
+# ─── Workspace ↔ monitor assignment ───────────────────────────
+# Workspace 1 (your coding base) is left unpinned on purpose: it
+# just follows whatever your "main" display is — the LG when it's
+# plugged in and set as main, the built-in screen when it's not.
+# Workspace 2 is forced to the built-in screen as a dedicated
+# laptop-only space you can reach no matter what's connected.
+# 3-9 are forced to the LG so they don't try to cram onto the small
+# screen when both displays are active.
+[workspace-to-monitor-force-assignment]
+2 = 'built-in'
+3 = '^LG.*'
+4 = '^LG.*'
+5 = '^LG.*'
+6 = '^LG.*'
+7 = '^LG.*'
+8 = '^LG.*'
+9 = '^LG.*'
+
+# ─── Workspace 1 = your coding home base ──────────────────────
+# Zen Browser (for docs/search while coding) + Kitty (tmux/neovim)
+# both land on workspace 1 automatically, tiled side by side.
+# NOTE: stick to 'tiles' here, not accordion — accordion stacks
+# windows with a slight offset (not real tabs), so a transparent
+# terminal would show the window sitting behind it. Tiles never
+# overlap at all, so transparency is always safe.
+[[on-window-detected]]
+if.app-id = 'app.zen-browser.zen'
+run = ['move-node-to-workspace 1', 'layout tiles', 'resize smart -250']
+
+[[on-window-detected]]
+if.app-id = 'net.kovidgoyal.kitty'
+run = ['move-node-to-workspace 1', 'layout tiles']
+
+# ─── Apps that should always float, never tile ────────────────
+[[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'
+run = 'layout floating'
+
+# Finder always floats — pairs with the alt-cmd-e summon key above,
+# so it behaves like a Hyprland-style dropdown scratchpad you can
+# pop in from any workspace instead of it eating tiling space.
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = 'layout floating'
