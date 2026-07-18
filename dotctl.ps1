@@ -5,27 +5,78 @@ param(
     [string]$Action = "install"
 )
 
-$Root = Split-Path -Parent $PSScriptRoot
-$UserHome = $HOME
+$Root = $PSScriptRoot
+$HomeDir = $HOME
 
-if ($IsWindows) {
-    $Config = Join-Path $env:APPDATA ""
-    $VSCodeConfig = Join-Path $env:APPDATA "Roaming\Code\User"
-    $WezTermConfig = Join-Path $UserHome ".wezterm.lua"
-    $ZshConfig = Join-Path $UserHome ".zshrc"
+function Get-TargetPaths {
+    if ($IsWindows) {
+        return @{
+            Nvim    = Join-Path $env:LOCALAPPDATA "nvim"
+            Kitty   = Join-Path $env:APPDATA "kitty"
+            Ghostty = Join-Path $env:APPDATA "ghostty"
+            Tmux    = Join-Path $env:APPDATA "tmux"
+            VSCode  = Join-Path $env:APPDATA "Code\User"
+            WezTerm = Join-Path $HomeDir ".wezterm.lua"
+            Zsh     = Join-Path $HomeDir ".zshrc"
+        }
+    }
+
+    if ($IsMacOS) {
+        return @{
+            Nvim    = Join-Path $HomeDir ".config/nvim"
+            Kitty   = Join-Path $HomeDir ".config/kitty"
+            Ghostty = Join-Path $HomeDir ".config/ghostty"
+            Tmux    = Join-Path $HomeDir ".config/tmux"
+            VSCode  = Join-Path $HomeDir "Library/Application Support/Code - Insiders/User"
+            WezTerm = Join-Path $HomeDir ".wezterm.lua"
+            Zsh     = Join-Path $HomeDir ".zshrc"
+        }
+    }
+
+    # Linux
+    return @{
+        Nvim    = Join-Path $HomeDir ".config/nvim"
+        Kitty   = Join-Path $HomeDir ".config/kitty"
+        Ghostty = Join-Path $HomeDir ".config/ghostty"
+        Tmux    = Join-Path $HomeDir ".config/tmux"
+        VSCode  = Join-Path $HomeDir ".config/Code/User"
+        WezTerm = Join-Path $HomeDir ".wezterm.lua"
+        Zsh     = Join-Path $HomeDir ".zshrc"
+    }
 }
-elseif ($IsMacOS) {
-    $Config = Join-Path $UserHome ".config"
-    $VSCodeConfig = Join-Path $UserHome "Library/Application Support/Code - Insiders/User"
-    $WezTermConfig = Join-Path $UserHome ".wezterm.lua"
-    $ZshConfig = Join-Path $UserHome ".zshrc"
-}
-else {
-    $Config = Join-Path $UserHome ".config"
-    $VSCodeConfig = Join-Path $Config "Code/User"
-    $WezTermConfig = Join-Path $UserHome ".wezterm.lua"
-    $ZshConfig = Join-Path $UserHome ".zshrc"
-}
+
+$Paths = Get-TargetPaths
+
+$Links = @(
+    @{
+        Source = Join-Path $Root "nvim"
+        Target = $Paths.Nvim
+    }
+    @{
+        Source = Join-Path $Root "kitty"
+        Target = $Paths.Kitty
+    }
+    @{
+        Source = Join-Path $Root "ghostty"
+        Target = $Paths.Ghostty
+    }
+    @{
+        Source = Join-Path $Root "tmux"
+        Target = $Paths.Tmux
+    }
+    @{
+        Source = Join-Path $Root "wezterm/.wezterm.lua"
+        Target = $Paths.WezTerm
+    }
+    @{
+        Source = Join-Path $Root "zsh/.zshrc"
+        Target = $Paths.Zsh
+    }
+    @{
+        Source = Join-Path $Root "vscode/settings.json"
+        Target = Join-Path $Paths.VSCode "settings.json"
+    }
+)
 
 function Link-Item {
     param(
@@ -33,9 +84,10 @@ function Link-Item {
         [string]$Target
     )
 
-    $parent = Split-Path $Target -Parent
-    if (!(Test-Path $parent)) {
-        New-Item -ItemType Directory -Path $parent -Force | Out-Null
+    $Parent = Split-Path $Target -Parent
+
+    if ($Parent -and !(Test-Path $Parent)) {
+        New-Item -ItemType Directory -Path $Parent -Force | Out-Null
     }
 
     if (Test-Path $Target -PathType Any) {
@@ -43,40 +95,37 @@ function Link-Item {
     }
 
     New-Item -ItemType SymbolicLink -Path $Target -Target $Source | Out-Null
-    Write-Host "Linked $Target -> $Source"
+
+    Write-Host "✓ Linked $Target"
 }
 
 function Remove-Link {
-    param([string]$Target)
+    param(
+        [string]$Target
+    )
 
     if (Test-Path $Target -PathType Any) {
         Remove-Item $Target -Recurse -Force
-        Write-Host "Removed $Target"
+        Write-Host "✓ Removed $Target"
     }
 }
 
 switch ($Action) {
+
     "install" {
-        if (!(Test-Path $Config)) {
-            New-Item -ItemType Directory -Path $Config -Force | Out-Null
+
+        foreach ($Link in $Links) {
+            Link-Item $Link.Source $Link.Target
         }
 
-        Link-Item "$Root/ghostty"              (Join-Path $Config "ghostty")
-        Link-Item "$Root/nvim"                 (Join-Path $Config "nvim")
-        Link-Item "$Root/kitty"                (Join-Path $Config "kitty")
-        Link-Item "$Root/tmux"                 (Join-Path $Config "tmux")
-        Link-Item "$Root/wezterm/.wezterm.lua" $WezTermConfig
-        Link-Item "$Root/zsh/.zshrc"           $ZshConfig
-        Link-Item "$Root/vscode/settings.json" (Join-Path $VSCodeConfig "settings.json")
     }
 
     "uninstall" {
-        Remove-Link (Join-Path $Config "ghostty")
-        Remove-Link (Join-Path $Config "nvim")
-        Remove-Link (Join-Path $Config "kitty")
-        Remove-Link (Join-Path $Config "tmux")
-        Remove-Link $WezTermConfig
-        Remove-Link $ZshConfig
-        Remove-Link (Join-Path $VSCodeConfig "settings.json")
+
+        foreach ($Link in $Links) {
+            Remove-Link $Link.Target
+        }
+
     }
+
 }
