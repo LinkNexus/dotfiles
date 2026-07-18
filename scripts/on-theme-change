@@ -1,0 +1,15 @@
+#!/bin/bash
+# Runs every time macOS switches between light and dark mode --
+# invoked by scripts/theme-watcher (compiled + started from
+# sketchybarrc at login). Add anything here that needs to react to a
+# theme change.
+
+# Recolor the sketchybar workspace pills
+sketchybar --trigger aerospace_workspace_change
+
+# Reload tmux config on the running server, same as prefix + r --
+# tmux_theme.conf re-detects the theme and sources the right palette
+if tmux has-session 2>/dev/null; then
+  tmux source-file ~/.config/tmux/tmux.conf
+  tmux display-message "Theme changed, tmux reloaded"
+fi

@@ -38,16 +38,18 @@ sketchybar --add item aerospace_control center \
                  update_freq=30
 
 # React instantly to OS light/dark switches: a tiny daemon observing
-# the distributed notification macOS posts on appearance change,
-# which re-triggers the rebuild (see theme_watcher.swift). Compiled
-# once on first run; update_freq=30 above stays as a fallback and to
-# catch new windows opened without a workspace switch.
-WATCHER="$CONFIG_DIR/theme_watcher"
+# the distributed notification macOS posts on appearance change. It
+# lives at the repo root (scripts/) because it serves more than
+# sketchybar -- it runs scripts/on-theme-change, which also reloads
+# tmux etc. Compiled once on first run; update_freq=30 above stays as
+# a fallback and catches new windows opened without a workspace switch.
+DOTFILES="$(dirname "$(readlink "$CONFIG_DIR" || echo "$HOME/dotfiles/sketchybar")")"
+WATCHER="$DOTFILES/scripts/theme-watcher"
 if [ ! -x "$WATCHER" ] && command -v swiftc >/dev/null 2>&1; then
-  swiftc -O -o "$WATCHER" "$CONFIG_DIR/theme_watcher.swift" >/dev/null 2>&1
+  swiftc -O -o "$WATCHER" "$WATCHER.swift" >/dev/null 2>&1
 fi
 pkill -f "$WATCHER" 2>/dev/null
-[ -x "$WATCHER" ] && "$WATCHER" &
+[ -x "$WATCHER" ] && "$WATCHER" "$DOTFILES/scripts/on-theme-change" &
 
 # Draw the initial state immediately, don't wait for the first switch
 sketchybar --trigger aerospace_workspace_change
