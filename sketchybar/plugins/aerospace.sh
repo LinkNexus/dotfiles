@@ -18,6 +18,23 @@ ICON_SCRIPT="$CONFIG_DIR/plugins/app_icon.sh"
 FOCUSED=$(aerospace list-workspaces --focused)
 NONEMPTY=$(aerospace list-workspaces --monitor focused --empty no)
 
+# Follow the OS appearance, like kitty's *-theme.auto.conf: macOS
+# reports AppleInterfaceStyle=Dark in dark mode and no key at all in
+# light mode. THEME_OVERRIDE exists for previewing the other variant.
+THEME=light
+[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" = "Dark" ] && THEME=dark
+[ -n "$THEME_OVERRIDE" ] && THEME="$THEME_OVERRIDE"
+
+# The focused pill INVERTS the theme (light pill in dark mode and
+# vice versa) -- maximum contrast without introducing any color
+if [ "$THEME" = "dark" ]; then
+  F_NUM="0xff111111"  F_PILL="0xe6f5f5f7"  F_BORDER="0x33000000"
+  U_NUM="0xff9a9aa5"  U_PILL="0xb314141c"  U_BORDER="0x33ffffff"
+else
+  F_NUM="0xffffffff"  F_PILL="0xd91c1c26"  F_BORDER="0x59ffffff"
+  U_NUM="0xff55555e"  U_PILL="0x99f2f2f5"  U_BORDER="0x1a000000"
+fi
+
 # Space items/brackets currently in the bar, one per line
 EXISTING=$(sketchybar --query bar | python3 -c '
 import json, sys
@@ -44,13 +61,13 @@ for ws in $NONEMPTY; do
   fi
 
   if [ "$ws" = "$FOCUSED" ]; then
-    NUM_COLOR="0xffffffff"
-    PILL_COLOR="0xd91c1c26"
-    PILL_BORDER="0x59ffffff"
+    NUM_COLOR="$F_NUM"
+    PILL_COLOR="$F_PILL"
+    PILL_BORDER="$F_BORDER"
   else
-    NUM_COLOR="0xff9a9aa5"
-    PILL_COLOR="0xb314141c"
-    PILL_BORDER="0x33ffffff"
+    NUM_COLOR="$U_NUM"
+    PILL_COLOR="$U_PILL"
+    PILL_BORDER="$U_BORDER"
   fi
 
   # The workspace-number item itself
@@ -75,6 +92,12 @@ for ws in $NONEMPTY; do
     i=$((i + 1))
     ITEM="space.$ws.app$i"
     ICON_PNG=$("$ICON_SCRIPT" "$app")
+
+    # Unfocused workspaces get the 35%-opacity variant of each icon
+    if [ -n "$ICON_PNG" ] && [ "$ws" != "$FOCUSED" ]; then
+      DIM_PNG="${ICON_PNG%.png}_dim.png"
+      [ -f "$DIM_PNG" ] && ICON_PNG="$DIM_PNG"
+    fi
 
     exists "$ITEM" || ARGS+=(--add item "$ITEM" center)
     if [ -n "$ICON_PNG" ]; then

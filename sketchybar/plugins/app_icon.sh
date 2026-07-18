@@ -12,9 +12,32 @@ mkdir -p "$CACHE_DIR"
 
 SAFE_NAME=$(echo "$APP_NAME" | tr -c 'A-Za-z0-9' '_')
 OUT="$CACHE_DIR/${SAFE_NAME}.png"
+DIM="$CACHE_DIR/${SAFE_NAME}_dim.png"
+
+# Renders a 35%-opacity copy of $OUT next to it -- used for app icons
+# in unfocused workspaces. sips can't touch alpha, so draw it with
+# AppKit via JXA (in-process, no permission prompts).
+make_dim() {
+  osascript -l JavaScript -e '
+    ObjC.import("AppKit");
+    const src = $.NSImage.alloc.initWithContentsOfFile("'"$OUT"'");
+    const size = src.size;
+    const out = $.NSImage.alloc.initWithSize(size);
+    out.lockFocus;
+    src.drawInRectFromRectOperationFraction(
+      $.NSMakeRect(0, 0, size.width, size.height),
+      $.NSMakeRect(0, 0, 0, 0),
+      $.NSCompositingOperationSourceOver, 0.35);
+    out.unlockFocus;
+    const rep = $.NSBitmapImageRep.imageRepWithData(out.TIFFRepresentation);
+    const png = rep.representationUsingTypeProperties(
+      $.NSBitmapImageFileTypePNG, $.NSDictionary.dictionary);
+    png.writeToFileAtomically("'"$DIM"'", true);' >/dev/null 2>&1
+}
 
 # Already cached from a previous run -- nothing to do
 if [[ -f "$OUT" ]]; then
+  [[ -f "$DIM" ]] || make_dim
   echo "$OUT"
   exit 0
 fi
@@ -49,6 +72,7 @@ fi
 sips -s format png "$ICNS_PATH" --out "$OUT" --resampleHeightWidthMax 48 >/dev/null 2>&1
 sips -c 40 40 "$OUT" >/dev/null 2>&1
 if [[ -f "$OUT" ]]; then
+  make_dim
   echo "$OUT"
 else
   exit 1
