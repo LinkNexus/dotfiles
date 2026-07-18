@@ -1,0 +1,41 @@
+#!/bin/bash
+# ~/.config/sketchybar/sketchybarrc
+#
+# Same non-destructive approach as before: fully transparent bar
+# overlaying the real native menu bar. The workspace items themselves
+# are created/destroyed dynamically by plugins/aerospace.sh, not
+# defined statically here -- this file just sets up the bar and wires
+# the trigger.
+
+CONFIG_DIR="$HOME/.config/sketchybar"
+
+# 30 = native menu bar height on this display (NSScreen frame minus
+# visibleFrame) -- must match or items sit higher than menu bar content
+sketchybar --bar height=30 \
+                  color=0x00000000 \
+                  border_width=0 \
+                  shadow=off \
+                  sticky=off \
+                  topmost=window \
+                  blur_radius=0 \
+                  y_offset=0
+
+sketchybar --default icon.drawing=off \
+                      label.drawing=off \
+                      background.drawing=off
+
+# Register the custom event that AeroSpace will trigger on workspace
+# change -- REQUIRED before anything can --subscribe to it
+sketchybar --add event aerospace_workspace_change
+
+# A hidden control item -- its only job is to own the event
+# subscription and run the rebuild script whenever workspaces change.
+sketchybar --add item aerospace_control center \
+           --subscribe aerospace_control aerospace_workspace_change \
+           --set aerospace_control \
+                 drawing=off \
+                 script="$CONFIG_DIR/plugins/aerospace.sh" \
+                 update_freq=0
+
+# Draw the initial state immediately, don't wait for the first switch
+sketchybar --trigger aerospace_workspace_change
