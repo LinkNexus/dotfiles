@@ -21,6 +21,8 @@ install:
 	ln -sfn $(ROOT)/wezterm/.wezterm.lua $(HOME)/.wezterm.lua
 	ln -sfn $(ROOT)/zsh/.zshrc $(HOME)/.zshrc
 	ln -sfn $(ROOT)/vscode/settings.json $(VSCODE_CONFIG)/settings.json
+	ln -sfn $(ROOT)/aerospace $(CONFIG)/aerospace
+	ln -sfn $(ROOT)/sketchybar $(CONFIG)/sketchybar
 
 uninstall:
 	rm -f $(CONFIG)/nvim
