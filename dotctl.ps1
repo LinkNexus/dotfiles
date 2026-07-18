@@ -10,7 +10,7 @@ $UserHome = $HOME
 
 if ($IsWindows) {
     $Config = Join-Path $env:APPDATA ""
-    $VSCodeConfig = Join-Path $env:APPDATA "Code\User"
+    $VSCodeConfig = Join-Path $env:APPDATA "Roaming\Code\User"
     $WezTermConfig = Join-Path $UserHome ".wezterm.lua"
     $ZshConfig = Join-Path $UserHome ".zshrc"
 }
