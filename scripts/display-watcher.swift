@@ -1,8 +1,10 @@
 // Tiny daemon that reacts to display configuration changes (monitor
 // plugged/unplugged, resolution change, displays waking from sleep).
-// CoreGraphics invokes the callback on every reconfiguration; on each
-// settled change we run the command given on our command line -- see
-// on-display-change for what actually happens.
+// Two detection paths, because CG callbacks proved unreliable for a
+// background launchd agent: the CoreGraphics reconfiguration callback
+// for instant reaction, plus a 10s poll of the widest screen as a
+// safety net. On each settled change we run the command given on our
+// command line -- see on-display-change for what actually happens.
 //
 // Compiled on demand by scripts/start-display-watcher:
 //   swiftc -O -o display-watcher display-watcher.swift
@@ -16,9 +18,32 @@ guard !hook.isEmpty else {
     exit(1)
 }
 
+// Opt out of App Nap: macOS suspends idle background processes, which
+// froze our run loop -- callbacks and timers were never delivered
+let activity = ProcessInfo.processInfo.beginActivity(
+    options: .userInitiatedAllowingIdleSystemSleep,
+    reason: "reacting to display connect/disconnect")
+_ = activity
+
+// Widest active screen in points; -1 = could not measure (transient
+// API failure -- never treat as "no screens"), 0 = truly no screens
+func currentMaxWidth() -> CGFloat {
+    var ids = [CGDirectDisplayID](repeating: 0, count: 16)
+    var count: UInt32 = 0
+    guard CGGetActiveDisplayList(16, &ids, &count) == .success else { return -1 }
+    var maxWidth: CGFloat = 0
+    for i in 0..<Int(count) {
+        maxWidth = max(maxWidth, CGDisplayBounds(ids[i]).width)
+    }
+    return maxWidth
+}
+
+var lastWidth: CGFloat = -1
+
 // extraArgs lets the startup run announce itself to the hook, which
 // waits for login to settle before acting
 func runHook(_ extraArgs: [String] = []) {
+    lastWidth = currentMaxWidth()
     let p = Process()
     p.executableURL = URL(fileURLWithPath: "/usr/bin/env")
     p.arguments = hook + extraArgs
@@ -35,9 +60,9 @@ func scheduleHook() {
     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: work)
 }
 
-// If registration fails (e.g. launchd started us before the window
-// server session was ready), exit nonzero so KeepAlive relaunches us
-// until it sticks -- silently continuing would leave a deaf daemon
+// Path 1: CG reconfiguration callback. If registration fails (e.g.
+// launchd started us before the window server session was ready),
+// exit nonzero so KeepAlive relaunches us until it sticks
 let err = CGDisplayRegisterReconfigurationCallback({ _, flags, _ in
     if flags.contains(.beginConfigurationFlag) { return }
     scheduleHook()
@@ -45,6 +70,15 @@ let err = CGDisplayRegisterReconfigurationCallback({ _, flags, _ in
 guard err == .success else {
     FileHandle.standardError.write(Data("display-watcher: callback registration failed (\(err.rawValue)), retrying via launchd\n".utf8))
     exit(1)
+}
+
+// Path 2: poll. Only fires the hook when the widest-screen width
+// actually changes, so it is silent in steady state
+Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { _ in
+    let width = currentMaxWidth()
+    if width >= 0 && width != lastWidth {
+        scheduleHook()
+    }
 }
 
 // Reconcile once at startup so login lands in the right state, then
