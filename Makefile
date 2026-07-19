@@ -24,7 +24,17 @@ install:
 	ln -sfn $(ROOT)/aerospace $(CONFIG)/aerospace
 	ln -sfn $(ROOT)/sketchybar $(CONFIG)/sketchybar
 
+	# Theme-change watcher runs as a LaunchAgent so it works even with
+	# AeroSpace/sketchybar disabled. Copied, not symlinked: launchd is
+	# unreliable with symlinked plists. Re-run install after plist edits.
+	mkdir -p $(HOME)/Library/LaunchAgents
+	cp $(ROOT)/launchd/com.levynkeneng.theme-watcher.plist $(HOME)/Library/LaunchAgents/
+	-launchctl bootout gui/$$(id -u)/com.levynkeneng.theme-watcher 2>/dev/null
+	launchctl bootstrap gui/$$(id -u) $(HOME)/Library/LaunchAgents/com.levynkeneng.theme-watcher.plist
+
 uninstall:
+	-launchctl bootout gui/$$(id -u)/com.levynkeneng.theme-watcher 2>/dev/null
+	rm -f $(HOME)/Library/LaunchAgents/com.levynkeneng.theme-watcher.plist
 	rm -f $(CONFIG)/nvim
 	rm -f $(CONFIG)/ghostty
 	rm -f $(CONFIG)/kitty
