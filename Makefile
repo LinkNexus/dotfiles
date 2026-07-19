@@ -37,9 +37,17 @@ install:
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.theme-watcher 2>/dev/null
 	launchctl bootstrap gui/$$(id -u) $(HOME)/Library/LaunchAgents/com.levynkeneng.theme-watcher.plist
 
+	# Display watcher: enables/disables AeroSpace + sketchybar based on
+	# whether a screen wide enough for tiling is connected
+	cp $(ROOT)/launchd/com.levynkeneng.display-watcher.plist $(HOME)/Library/LaunchAgents/
+	-launchctl bootout gui/$$(id -u)/com.levynkeneng.display-watcher 2>/dev/null
+	launchctl bootstrap gui/$$(id -u) $(HOME)/Library/LaunchAgents/com.levynkeneng.display-watcher.plist
+
 uninstall:
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.theme-watcher 2>/dev/null
 	rm -f $(HOME)/Library/LaunchAgents/com.levynkeneng.theme-watcher.plist
+	-launchctl bootout gui/$$(id -u)/com.levynkeneng.display-watcher 2>/dev/null
+	rm -f $(HOME)/Library/LaunchAgents/com.levynkeneng.display-watcher.plist
 	rm -f $(HOME)/.claude/themes
 	rm -f $(CONFIG)/nvim
 	rm -f $(CONFIG)/ghostty

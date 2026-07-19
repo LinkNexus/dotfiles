@@ -1,0 +1,13 @@
+#!/bin/bash
+# Entry point for the display-watcher LaunchAgent (launchd/*.plist).
+# Enables/disables AeroSpace + sketchybar depending on whether a
+# screen comfortable for tiling is connected -- see on-display-change.
+
+DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# The compiled binary is gitignored; build it on first run
+if [ ! -x "$DIR/display-watcher" ]; then
+  swiftc -O -o "$DIR/display-watcher" "$DIR/display-watcher.swift" || exit 1
+fi
+
+exec "$DIR/display-watcher" "$DIR/on-display-change"
