@@ -24,3 +24,25 @@ fi
 if pgrep -xq borders; then
   borders $("$(dirname "$0")/border-colors")
 fi
+
+# Switch Claude Code between the custom carbonfox/dayfox themes
+# (claude/themes in this repo, symlinked to ~/.claude/themes).
+# Running sessions hot-reload settings.json, so this applies live.
+if [ "${THEME_OVERRIDE:-$(defaults read -g AppleInterfaceStyle 2>/dev/null)}" = "Dark" ] || [ "${THEME_OVERRIDE:-}" = "dark" ]; then
+  CLAUDE_THEME="custom:carbonfox"
+else
+  CLAUDE_THEME="custom:dayfox"
+fi
+python3 - "$CLAUDE_THEME" <<'EOF'
+import json, os, sys
+path = os.path.expanduser("~/.claude/settings.json")
+try:
+    with open(path) as f:
+        settings = json.load(f)
+except (FileNotFoundError, ValueError):
+    settings = {}
+settings["theme"] = sys.argv[1]
+with open(path, "w") as f:
+    json.dump(settings, f, indent=2)
+    f.write("\n")
+EOF

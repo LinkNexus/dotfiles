@@ -1,0 +1,30 @@
+{
+  "name": "Dayfox",
+  "base": "light",
+  "overrides": {
+    "claude": "#6e33ce",
+    "claudeShimmer": "#a440b5",
+    "text": "#3d2b5a",
+    "subtle": "#643f61",
+    "inactive": "#837a72",
+    "suggestion": "#2848a9",
+    "success": "#396847",
+    "error": "#a5222f",
+    "warning": "#ac5402",
+    "merged": "#6e33ce",
+    "permission": "#2848a9",
+    "planMode": "#287980",
+    "autoAccept": "#ac5402",
+    "remember": "#6e33ce",
+    "ide": "#287980",
+    "promptBorder": "#aab0ad",
+    "bashBorder": "#a440b5",
+    "selectionBg": "#e7d2be",
+    "diffAdded": "#d9e6d4",
+    "diffRemoved": "#f0d5d4",
+    "diffAddedDimmed": "#e7eee3",
+    "diffRemovedDimmed": "#f4e4e1",
+    "diffAddedWord": "#b8d4ae",
+    "diffRemovedWord": "#e8b6b3"
+  }
+}

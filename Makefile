@@ -24,6 +24,11 @@ install:
 	ln -sfn $(ROOT)/aerospace $(CONFIG)/aerospace
 	ln -sfn $(ROOT)/sketchybar $(CONFIG)/sketchybar
 
+	# Custom Claude Code themes (carbonfox/dayfox, switched by
+	# scripts/on-theme-change following the OS appearance)
+	mkdir -p $(HOME)/.claude
+	ln -sfn $(ROOT)/claude/themes $(HOME)/.claude/themes
+
 	# Theme-change watcher runs as a LaunchAgent so it works even with
 	# AeroSpace/sketchybar disabled. Copied, not symlinked: launchd is
 	# unreliable with symlinked plists. Re-run install after plist edits.
@@ -35,6 +40,7 @@ install:
 uninstall:
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.theme-watcher 2>/dev/null
 	rm -f $(HOME)/Library/LaunchAgents/com.levynkeneng.theme-watcher.plist
+	rm -f $(HOME)/.claude/themes
 	rm -f $(CONFIG)/nvim
 	rm -f $(CONFIG)/ghostty
 	rm -f $(CONFIG)/kitty
