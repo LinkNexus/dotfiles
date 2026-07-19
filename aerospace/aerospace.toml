@@ -24,6 +24,12 @@ persistent-workspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 after-startup-command = ['exec-and-forget sketchybar', 'exec-and-forget ~/dotfiles/scripts/start-borders']
 exec-on-workspace-change = ['/bin/bash', '-c', 'sketchybar --trigger aerospace_workspace_change']
 
+# AeroSpace only injects homebrew into the PATH of commands it spawns;
+# tmux lives in the nix profile, and scripts/on-theme-change (started
+# down the sketchybar -> theme-watcher chain) needs to find it
+[exec.env-vars]
+PATH = '/run/current-system/sw/bin:/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
+
 [gaps]
 inner.horizontal = 8
 inner.vertical = 8
