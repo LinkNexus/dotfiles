@@ -11,6 +11,18 @@
 # overridable from the environment for testing.
 MIN_WIDTH="${MIN_WIDTH:-1800}"
 
+LOG=/tmp/display-watcher.log
+log() { echo "$(date '+%F %T') $*" >> "$LOG"; }
+
+# At login (the watcher's first run passes "startup") AeroSpace and
+# the displays may not be up yet; wait for AeroSpace before deciding
+if [ "$1" = "startup" ]; then
+  for _ in $(seq 1 12); do
+    pgrep -xq AeroSpace && break
+    sleep 5
+  done
+fi
+
 WIDEST=$(osascript -l JavaScript -e '
 ObjC.import("AppKit");
 let max = 0;
@@ -19,14 +31,33 @@ for (let i = 0; i < screens.count; i++) {
   const w = screens.objectAtIndex(i).frame.size.width;
   if (w > max) max = w;
 }
-Math.round(max)')
+Math.round(max)' 2>/dev/null)
 
-if [ -n "$WIDEST" ] && [ "$WIDEST" -ge "$MIN_WIDTH" ]; then
-  aerospace enable on 2>/dev/null
+# If we could not measure (early login, window server not ready...),
+# DO NOTHING -- wrongly disabling is worse than staying stale
+if ! [ "$WIDEST" -ge 0 ] 2>/dev/null; then
+  log "screen measurement failed (got '$WIDEST'); leaving state untouched"
+  exit 0
+fi
+
+# The aerospace server can lag behind login; retry briefly
+aerospace_enable() {
+  for _ in $(seq 1 10); do
+    aerospace enable "$1" 2>/dev/null && return 0
+    pgrep -xq AeroSpace || return 1
+    sleep 2
+  done
+  return 1
+}
+
+if [ "$WIDEST" -ge "$MIN_WIDTH" ]; then
+  log "widest screen ${WIDEST}pt >= ${MIN_WIDTH}: aerospace on, sketchybar on"
+  aerospace_enable on || log "  aerospace enable on FAILED"
   if ! pgrep -xq sketchybar; then
     nohup sketchybar >/dev/null 2>&1 &
   fi
 else
-  aerospace enable off 2>/dev/null
+  log "widest screen ${WIDEST}pt < ${MIN_WIDTH}: aerospace off, sketchybar off"
+  aerospace_enable off || log "  aerospace enable off FAILED"
   pkill -x sketchybar 2>/dev/null
 fi

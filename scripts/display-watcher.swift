@@ -1,8 +1,8 @@
 // Tiny daemon that reacts to display configuration changes (monitor
-// plugged/unplugged, resolution change). CoreGraphics invokes the
-// callback on every reconfiguration; on each settled change we run the
-// command given on our command line -- see on-display-change for what
-// actually happens.
+// plugged/unplugged, resolution change, displays waking from sleep).
+// CoreGraphics invokes the callback on every reconfiguration; on each
+// settled change we run the command given on our command line -- see
+// on-display-change for what actually happens.
 //
 // Compiled on demand by scripts/start-display-watcher:
 //   swiftc -O -o display-watcher display-watcher.swift
@@ -16,10 +16,12 @@ guard !hook.isEmpty else {
     exit(1)
 }
 
-func runHook() {
+// extraArgs lets the startup run announce itself to the hook, which
+// waits for login to settle before acting
+func runHook(_ extraArgs: [String] = []) {
     let p = Process()
     p.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-    p.arguments = hook
+    p.arguments = hook + extraArgs
     try? p.run()
 }
 
@@ -33,12 +35,19 @@ func scheduleHook() {
     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: work)
 }
 
-CGDisplayRegisterReconfigurationCallback({ _, flags, _ in
+// If registration fails (e.g. launchd started us before the window
+// server session was ready), exit nonzero so KeepAlive relaunches us
+// until it sticks -- silently continuing would leave a deaf daemon
+let err = CGDisplayRegisterReconfigurationCallback({ _, flags, _ in
     if flags.contains(.beginConfigurationFlag) { return }
     scheduleHook()
 }, nil)
+guard err == .success else {
+    FileHandle.standardError.write(Data("display-watcher: callback registration failed (\(err.rawValue)), retrying via launchd\n".utf8))
+    exit(1)
+}
 
 // Reconcile once at startup so login lands in the right state, then
 // wait for events
-runHook()
+runHook(["startup"])
 RunLoop.main.run()
