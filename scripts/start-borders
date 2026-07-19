@@ -1,0 +1,7 @@
+#!/bin/bash
+# Launches JankyBorders with colors matching the current OS theme.
+# Called by AeroSpace's after-startup-command instead of invoking
+# borders with hardcoded colors; on-theme-change keeps the colors in
+# sync afterwards.
+
+exec borders $("$(dirname "$0")/border-colors") width=5.0

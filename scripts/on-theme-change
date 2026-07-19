@@ -13,3 +13,10 @@ if tmux has-session 2>/dev/null; then
   tmux source-file ~/.config/tmux/tmux.conf
   tmux display-message "Theme changed, tmux reloaded"
 fi
+
+# Recolor JankyBorders window borders (live update; the pgrep guard
+# matters -- with no daemon running, borders would BECOME the daemon
+# and this script would block forever)
+if pgrep -xq borders; then
+  borders $("$(dirname "$0")/border-colors")
+fi

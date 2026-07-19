@@ -1,0 +1,15 @@
+#!/bin/bash
+# Prints the JankyBorders color arguments for the current OS theme.
+# Single source of truth -- used by start-borders at login and by
+# on-theme-change when the appearance flips.
+# THEME_OVERRIDE=light|dark exists for previewing the other variant.
+
+THEME=light
+[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" = "Dark" ] && THEME=dark
+[ -n "$THEME_OVERRIDE" ] && THEME="$THEME_OVERRIDE"
+
+if [ "$THEME" = "dark" ]; then
+  echo "active_color=0xffe1e3e4 inactive_color=0xff494d64"
+else
+  echo "active_color=0xff2e2e34 inactive_color=0xffaeaeb6"
+fi

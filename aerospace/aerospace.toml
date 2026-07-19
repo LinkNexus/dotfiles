@@ -19,7 +19,9 @@ automatically-unhide-macos-hidden-apps = true
 # disappear from the list when you close everything on it).
 persistent-workspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
-after-startup-command = ['exec-and-forget sketchybar', 'exec-and-forget borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0']
+# Borders are started through a wrapper that picks colors for the
+# current OS theme; scripts/on-theme-change keeps them in sync after
+after-startup-command = ['exec-and-forget sketchybar', 'exec-and-forget ~/dotfiles/scripts/start-borders']
 exec-on-workspace-change = ['/bin/bash', '-c', 'sketchybar --trigger aerospace_workspace_change']
 
 [gaps]
