@@ -1,3 +1,9 @@
+# Windows has no built-in `make`: install one via `choco install make`,
+# `scoop install make`, or MSYS2's `pacman -S make`, then run this from
+# Git Bash (its bundled sh.exe/coreutils are what make the POSIX-shell
+# recipes below -- ln -sfn, mkdir -p, rm -f -- work). Creating symlinks
+# also needs either an elevated shell or Developer Mode turned on.
+
 ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 CONFIG := $(HOME)/.config
 
