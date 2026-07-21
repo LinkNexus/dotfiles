@@ -3,29 +3,51 @@ CONFIG := $(HOME)/.config
 
 UNAME_S := $(shell uname -s)
 
+# WSL reports itself as plain "Linux" -- same $HOME/.config layout as
+# native Linux, just running under Windows -- so it rides the linux
+# branch below. Native Windows only shows up via a POSIX layer like Git
+# Bash/MSYS, which reports MINGW*/MSYS*/CYGWIN*.
 ifeq ($(UNAME_S),Darwin)
+	OS := macos
+else ifneq (,$(filter MINGW% MSYS% CYGWIN%,$(UNAME_S)))
+	OS := windows
+else
+	OS := linux
+endif
+
+ifeq ($(OS),macos)
 	VSCODE_CONFIG := "$(HOME)/Library/Application Support/Code - Insiders/User"
+else ifeq ($(OS),windows)
+	# Assumes native Windows, not a WSL-side VS Code -- Git Bash's $HOME
+	# already resolves to the Windows user profile
+	VSCODE_CONFIG := "$(HOME)/AppData/Roaming/Code/User"
 else
 	VSCODE_CONFIG := $(HOME)/.config/Code/User
 endif
 
-.PHONY: install uninstall
+.PHONY: install install-common install-macos install-linux install-windows uninstall
 
-install:
+install: install-common install-$(OS)
+
+# Wanted on every OS this repo targets
+install-common:
 	mkdir -p $(CONFIG)
-
-	ln -sfn $(ROOT)/ghostty $(CONFIG)/ghostty
 	ln -sfn $(ROOT)/nvim $(CONFIG)/nvim
+	ln -sfn $(ROOT)/vscode/settings.json $(VSCODE_CONFIG)/settings.json
+
+install-macos:
+	ln -sfn $(ROOT)/ghostty $(CONFIG)/ghostty
 	ln -sfn $(ROOT)/kitty $(CONFIG)/kitty
 	ln -sfn $(ROOT)/tmux $(CONFIG)/tmux
 	ln -sfn $(ROOT)/wezterm/.wezterm.lua $(HOME)/.wezterm.lua
 	ln -sfn $(ROOT)/zsh/.zshrc $(HOME)/.zshrc
-	ln -sfn $(ROOT)/vscode/settings.json $(VSCODE_CONFIG)/settings.json
 	ln -sfn $(ROOT)/aerospace $(CONFIG)/aerospace
 	ln -sfn $(ROOT)/sketchybar $(CONFIG)/sketchybar
 
 	# Custom Claude Code themes (carbonfox/dayfox, switched by
-	# scripts/on-theme-change following the OS appearance)
+	# scripts/on-theme-change following the OS appearance). macOS-only
+	# for now: the auto-switch mechanism is tied to AppleInterfaceStyle
+	# and launchd. Revisit once Linux/Windows get their own watchers.
 	mkdir -p $(HOME)/.claude
 	ln -sfn $(ROOT)/claude/themes $(HOME)/.claude/themes
 
@@ -37,12 +59,31 @@ install:
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.theme-watcher 2>/dev/null
 	launchctl bootstrap gui/$$(id -u) $(HOME)/Library/LaunchAgents/com.levynkeneng.theme-watcher.plist
 
-	# Display watcher: enables/disables AeroSpace + sketchybar based on
-	# whether a screen wide enough for tiling is connected
+	# Display watcher: enables/disables AeroSpace, sketchybar, JankyBorders
+	# and Stage Manager based on whether a screen wide enough for tiling
+	# is connected
 	cp $(ROOT)/launchd/com.levynkeneng.display-watcher.plist $(HOME)/Library/LaunchAgents/
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.display-watcher 2>/dev/null
 	launchctl bootstrap gui/$$(id -u) $(HOME)/Library/LaunchAgents/com.levynkeneng.display-watcher.plist
 
+install-linux:
+	ln -sfn $(ROOT)/ghostty $(CONFIG)/ghostty
+	ln -sfn $(ROOT)/kitty $(CONFIG)/kitty
+	ln -sfn $(ROOT)/tmux $(CONFIG)/tmux
+	ln -sfn $(ROOT)/zsh/.zshrc $(HOME)/.zshrc
+
+install-windows:
+	# ghostty/kitty/tmux/zsh have no native Windows build -- they live
+	# under the WSL branch above (WSL reports as "linux"). wezterm does
+	# ship a native Windows GUI, and its config always lives on the
+	# Windows side even when it's opening a WSL shell.
+	ln -sfn $(ROOT)/wezterm/.wezterm.lua $(HOME)/.wezterm.lua
+
+# Removes every link/agent this Makefile could ever have created, on any
+# OS, with no OS check -- so running this also mops up whatever a past
+# install left behind on a machine that no longer needs it (e.g. mac-only
+# links from before this was split up). Every rm -f/launchctl call is
+# harmless if its target never existed on this machine.
 uninstall:
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.theme-watcher 2>/dev/null
 	rm -f $(HOME)/Library/LaunchAgents/com.levynkeneng.theme-watcher.plist
@@ -53,6 +94,10 @@ uninstall:
 	rm -f $(CONFIG)/ghostty
 	rm -f $(CONFIG)/kitty
 	rm -f $(CONFIG)/tmux
+	rm -f $(CONFIG)/aerospace
+	rm -f $(CONFIG)/sketchybar
 	rm -f $(HOME)/.wezterm.lua
 	rm -f $(HOME)/.zshrc
-	rm -f $(VSCODE_CONFIG)/settings.json
+	rm -f "$(HOME)/Library/Application Support/Code - Insiders/User/settings.json"
+	rm -f $(HOME)/.config/Code/User/settings.json
+	rm -f "$(HOME)/AppData/Roaming/Code/User/settings.json"
