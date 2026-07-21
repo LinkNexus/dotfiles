@@ -3,8 +3,10 @@
 # invoked by scripts/display-watcher (LaunchAgent, independent of
 # AeroSpace). Decides whether tiling is worth having from the WIDTH of
 # the biggest connected screen instead of hardcoding a specific
-# monitor: below the threshold AeroSpace is disabled and sketchybar
-# (useless without it) is stopped; at or above it both come back.
+# monitor: below the threshold AeroSpace, sketchybar and JankyBorders
+# are stopped and Stage Manager (macOS's own window manager, which
+# only makes sense without tiling) comes back; at or above it that
+# flips the other way.
 #
 # Reference widths in points: built-in 14" = 1512, 16" = 1728; most
 # 27" externals >= 1920; the LG ultrawide = 2924. MIN_WIDTH is also
@@ -50,14 +52,39 @@ aerospace_enable() {
   return 1
 }
 
+# Stage Manager fights with tiling (both want to own window placement),
+# so it's off while AeroSpace is on and back on when AeroSpace is not.
+# killall Dock is how a GloballyEnabled change actually takes effect --
+# skip it when the value is already right so we don't restart the Dock
+# (and flash the screen) on every display event for nothing.
+stage_manager() {
+  local want=0 bool=false
+  if [ "$1" = on ]; then
+    want=1
+    bool=true
+  fi
+  local current
+  current=$(defaults read com.apple.WindowManager GloballyEnabled 2>/dev/null)
+  if [ "$current" != "$want" ]; then
+    defaults write com.apple.WindowManager GloballyEnabled -bool "$bool"
+    killall Dock 2>/dev/null
+  fi
+}
+
 if [ "$WIDEST" -ge "$MIN_WIDTH" ]; then
-  log "widest screen ${WIDEST}pt >= ${MIN_WIDTH}: aerospace on, sketchybar on"
+  log "widest screen ${WIDEST}pt >= ${MIN_WIDTH}: aerospace on, sketchybar on, borders on, stage manager off"
   aerospace_enable on || log "  aerospace enable on FAILED"
   if ! pgrep -xq sketchybar; then
     nohup sketchybar >/dev/null 2>&1 &
   fi
+  if ! pgrep -xq borders; then
+    nohup "$(dirname "$0")/start-borders" >/dev/null 2>&1 &
+  fi
+  stage_manager off
 else
-  log "widest screen ${WIDEST}pt < ${MIN_WIDTH}: aerospace off, sketchybar off"
+  log "widest screen ${WIDEST}pt < ${MIN_WIDTH}: aerospace off, sketchybar off, borders off, stage manager on"
   aerospace_enable off || log "  aerospace enable off FAILED"
   pkill -x sketchybar 2>/dev/null
+  pkill -x borders 2>/dev/null
+  stage_manager on
 fi
