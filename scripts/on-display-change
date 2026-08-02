@@ -78,8 +78,21 @@ if [ "$WIDEST" -ge "$MIN_WIDTH" ]; then
   stage_manager off
 else
   log "widest screen ${WIDEST}pt < ${MIN_WIDTH}: aerospace off, sketchybar off, borders off, stage manager on"
+  # Captured before aerospace_run off so this only fires on the actual
+  # on->off transition, not on every re-run of this script while
+  # already in laptop-only mode (e.g. an unrelated display event during
+  # a later sleep/wake cycle)
+  was_aerospace_running=0
+  pgrep -xq AeroSpace && was_aerospace_running=1
   aerospace_run off
   pkill -x sketchybar 2>/dev/null
   pkill -x borders 2>/dev/null
   stage_manager on
+
+  # Windows keep whatever size/position they had while tiled on the
+  # external monitor -- hammerspoon/init.lua fills them back out to the
+  # (now solely built-in) screen
+  if [ "$was_aerospace_running" = 1 ] && pgrep -xq Hammerspoon; then
+    hs -c 'maximizeAllStandardWindows()' >/dev/null 2>&1
+  fi
 fi

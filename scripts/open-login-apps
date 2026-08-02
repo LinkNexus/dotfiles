@@ -1,0 +1,19 @@
+#!/bin/bash
+# Opens the daily app set once per login, independent of whether
+# AeroSpace ends up enabled for this session (scripts/on-display-change
+# decides that separately, based on screen size). Only meant to run
+# once per login (see com.levynkeneng.login-apps.plist, RunAtLoad
+# without KeepAlive) -- kitty below spawns a fresh window on every run.
+
+# kitty's binary is invoked directly (not `open -a`) so this always
+# opens a plain new window instead of racing Launch Services' own
+# already-running/activate-vs-launch handling. Titled so hammerspoon's
+# alt-cmd-c can find this exact window later instead of spawning another.
+/opt/homebrew/bin/kitty --title kitty.main &
+open -a Zen
+open -a Thunderbird
+
+# Reuses an existing kitty.btop window instead of spawning a duplicate;
+# on-window-detected in aerospace.toml pins it to workspace 2 when
+# AeroSpace is active.
+"$(dirname "$0")/open-btop"

@@ -8,8 +8,13 @@ THEME=light
 [ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" = "Dark" ] && THEME=dark
 [ -n "$THEME_OVERRIDE" ] && THEME="$THEME_OVERRIDE"
 
+# Active color is the same purple accent carbonfox/dayfox use for
+# "claude" elsewhere (claude/themes/*.json) so the focused-window
+# highlight reads as this setup's signature color instead of a
+# low-contrast near-black/near-white line; inactive reuses those same
+# themes' "inactive" shade.
 if [ "$THEME" = "dark" ]; then
-  echo "active_color=0xffe1e3e4 inactive_color=0xff494d64"
+  echo "active_color=0xffbe95ff inactive_color=0xff5a5a5c"
 else
-  echo "active_color=0xff2e2e34 inactive_color=0xffaeaeb6"
+  echo "active_color=0xff6e33ce inactive_color=0xff837a72"
 fi

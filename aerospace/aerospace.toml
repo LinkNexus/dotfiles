@@ -101,10 +101,13 @@ alt-cmd-backtick = 'workspace-back-and-forth'
 # Reload config on the fly
 alt-cmd-shift-c = 'reload-config'
 
-alt-cmd-e = 'exec-and-forget open -a Finder'
-alt-cmd-b = 'exec-and-forget open -a Zen'
 alt-cmd-m = 'exec-and-forget open -a Thunderbird'
-alt-cmd-i = 'exec-and-forget kitty-scratch-toggle'
+# The kitty scratchpad, btop, Finder scratchpad, browser and main
+# terminal toggles used to be bound here, but on-display-change fully
+# quits AeroSpace on the laptop screen, which would take the bindings
+# down with it. They now live in hammerspoon/init.lua instead, which
+# runs independently of AeroSpace and branches its behavior on whether
+# AeroSpace is up (alt-cmd-i/t/e/b/c).
 
 # Enter "service" mode for less-frequent commands
 alt-cmd-shift-semicolon = 'mode service'
@@ -115,6 +118,46 @@ esc       = ['reload-config', 'mode main']
 r         = ['flatten-workspace-tree', 'mode main']   # reset layout
 f         = ['layout floating tiling', 'mode main']
 backspace = ['close-all-windows-but-current', 'mode main']
+
+# ─── Window rules ───────────────────────────────────────────
+# Array-of-tables form (strict-TOML friendly, unlike a multiline inline
+# `{ ... }` inside on-window-detected = [...], which some strict TOML
+# tools like taplo reject even though AeroSpace's own parser accepts it).
+# `if` uses the current v2 `test` condition syntax; the old
+# `if.app-id = '...'` shorthand is soft-deprecated.
+[[on-window-detected]]
+if = 'test %{app-bundle-id} = com.apple.systempreferences'
+check-further-callbacks = true
+run = ['layout floating']
+
+[[on-window-detected]]
+if = 'test %{window-title} ~= kitty.scratchpad'
+run = ['layout floating']
+
+[[on-window-detected]]
+if = 'test %{app-bundle-id} = com.apple.finder'
+run = ['layout floating']
+
+# ─── Apps pinned to a fixed workspace ──────────────────────────
+[[on-window-detected]]
+if = 'test %{app-bundle-id} = org.mozilla.thunderbird'
+run = ['move-node-to-workspace 2']
+
+[[on-window-detected]]
+if = 'test %{app-bundle-id} = com.apple.ActivityMonitor'
+run = ['move-node-to-workspace 2']
+
+[[on-window-detected]]
+if = 'test %{window-title} ~= kitty.btop'
+run = ['move-node-to-workspace 2']
+
+# [[on-window-detected]]
+# if = 'test %{app-bundle-id} = app.zen-browser.zen'
+# run = ['move-node-to-workspace 1', 'layout tiles', 'resize smart -250']
+#
+# [[on-window-detected]]
+# if = 'test %{app-bundle-id} = net.kovidgoyal.kitty'
+# run = ['move-node-to-workspace 1', 'layout tiles']
 
 # ─── Workspace ↔ monitor assignment ───────────────────────────
 # Workspace 1 (your coding base) is left unpinned on purpose: it
@@ -133,30 +176,3 @@ backspace = ['close-all-windows-but-current', 'mode main']
 7 = '^LG.*'
 8 = '^LG.*'
 9 = '^LG.*'
-
-# ─── Workspace 1 = your coding home base ──────────────────────
-# Zen Browser (for docs/search while coding) + Kitty (tmux/neovim)
-# both land on workspace 1 automatically, tiled side by side.
-# NOTE: stick to 'tiles' here, not accordion — accordion stacks
-# windows with a slight offset (not real tabs), so a transparent
-# terminal would show the window sitting behind it. Tiles never
-# overlap at all, so transparency is always safe.
-[[on-window-detected]]
-if.app-id = 'app.zen-browser.zen'
-run = ['move-node-to-workspace 1', 'layout tiles', 'resize smart -250']
-
-[[on-window-detected]]
-if.app-id = 'net.kovidgoyal.kitty'
-run = ['move-node-to-workspace 1', 'layout tiles']
-
-# ─── Apps that should always float, never tile ────────────────
-[[on-window-detected]]
-if.app-id = 'com.apple.systempreferences'
-run = 'layout floating'
-
-# Finder always floats — pairs with the alt-cmd-e summon key above,
-# so it behaves like a Hyprland-style dropdown scratchpad you can
-# pop in from any workspace instead of it eating tiling space.
-[[on-window-detected]]
-if.app-id = 'com.apple.finder'
-run = 'layout floating'

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.levynkeneng.login-apps</string>
+
+	<!-- launchd does not expand $HOME in ProgramArguments, hence the
+	     absolute path. Installed by `make install` (copied, not
+	     symlinked -- launchd is unreliable with symlinked plists). -->
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/levynkeneng/dotfiles/scripts/open-login-apps</string>
+	</array>
+
+	<!-- Fire once per login and exit -- unlike the watchers, this isn't
+	     a long-running daemon, so no KeepAlive/ThrottleInterval -->
+	<key>RunAtLoad</key>
+	<true/>
+
+	<!-- launchd's default PATH has neither nix nor homebrew; the
+	     script needs kitty/aerospace-scratchpad's open-btop -->
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/run/current-system/sw/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+	</dict>
+
+	<key>StandardErrorPath</key>
+	<string>/tmp/login-apps.err</string>
+</dict>
+</plist>
