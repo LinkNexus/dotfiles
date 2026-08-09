@@ -1,0 +1,83 @@
+# Theme: dayfox
+# Colors lifted straight from kitty/light-theme.auto.conf (nightfox.nvim's
+# dayfox palette: https://github.com/EdenEast/nightfox.nvim) so btop
+# matches the rest of this setup instead of drifting to its own palette.
+
+# Main bg
+theme[main_bg]="#f6f2ee"
+
+# Main text color
+theme[main_fg]="#3d2b5a"
+
+# Title color for boxes
+theme[title]="#3d2b5a"
+
+# Highlight color for keyboard shortcuts
+theme[hi_fg]="#2848a9"
+
+# Background color of selected item in processes box
+theme[selected_bg]="#e7d2be"
+
+# Foreground color of selected item in processes box
+theme[selected_fg]="#3d2b5a"
+
+# Color of inactive/disabled text
+theme[inactive_fg]="#534c45"
+
+# Misc colors for processes box including mini cpu graphs, details memory graph and details status text
+theme[proc_misc]="#2848a9"
+
+# Cpu box outline color
+theme[cpu_box]="#aab0ad"
+
+# Memory/disks box outline color
+theme[mem_box]="#aab0ad"
+
+# Net up/down box outline color
+theme[net_box]="#aab0ad"
+
+# Processes box outline color
+theme[proc_box]="#aab0ad"
+
+# Box divider line and small boxes line color
+theme[div_line]="#aab0ad"
+
+# Temperature graph colors
+theme[temp_start]="#396847"
+theme[temp_mid]="#ac5402"
+theme[temp_end]="#a5222f"
+
+# CPU graph colors
+theme[cpu_start]="#396847"
+theme[cpu_mid]="#ac5402"
+theme[cpu_end]="#a5222f"
+
+# Mem/Disk free meter
+theme[free_start]="#396847"
+theme[free_mid]="#ac5402"
+theme[free_end]="#a5222f"
+
+# Mem/Disk cached meter
+theme[cached_start]="#396847"
+theme[cached_mid]="#ac5402"
+theme[cached_end]="#a5222f"
+
+# Mem/Disk available meter
+theme[available_start]="#396847"
+theme[available_mid]="#ac5402"
+theme[available_end]="#a5222f"
+
+# Mem/Disk used meter
+theme[used_start]="#396847"
+theme[used_mid]="#ac5402"
+theme[used_end]="#a5222f"
+
+# Download graph colors
+theme[download_start]="#396847"
+theme[download_mid]="#ac5402"
+theme[download_end]="#a5222f"
+
+# Upload graph colors
+theme[upload_start]="#396847"
+theme[upload_mid]="#ac5402"
+theme[upload_end]="#a5222f"

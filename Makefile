@@ -53,6 +53,7 @@ install-macos: setup-zsh
 	ln -sfn $(ROOT)/aerospace $(CONFIG)/aerospace
 	ln -sfn $(ROOT)/sketchybar $(CONFIG)/sketchybar
 	ln -sfn $(ROOT)/hammerspoon $(HOME)/.hammerspoon
+	ln -sfn $(ROOT)/btop $(CONFIG)/btop
 
 	# Custom Claude Code themes (carbonfox/dayfox, switched by
 	# scripts/on-theme-change following the OS appearance). macOS-only
@@ -106,6 +107,7 @@ uninstall:
 	rm -f $(CONFIG)/aerospace
 	rm -f $(CONFIG)/sketchybar
 	rm -f $(HOME)/.hammerspoon
+	rm -f $(CONFIG)/btop
 	rm -f $(HOME)/.wezterm.lua
 	rm -f $(HOME)/.zshenv
 	rm -f "$(HOME)/Library/Application Support/Code - Insiders/User/settings.json"
