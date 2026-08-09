@@ -15,4 +15,4 @@ export VISUAL="nvim"
 
 export GPG_TTY=$(tty)
 
-export PATH="/run/current-system/sw/bin:$HOME/.local/share/nvim/mason/bin:/opt/homebrew/bin:$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.dotnet/tools:$HOME/dotfiles/scripts:$HOME/.bun/bin:$PATH"
+export PATH="/run/current-system/sw/bin:$HOME/.local/share/nvim/mason/bin:/opt/homebrew/bin:$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.dotnet/tools:$HOME/dotfiles/scripts:$HOME/.bun/bin:$HOME/.cache/.bun/bin:$PATH"
