@@ -51,7 +51,15 @@ install-macos: setup-zsh
 	ln -sfn $(ROOT)/wezterm/.wezterm.lua $(HOME)/.wezterm.lua
 	ln -sfn $(ROOT)/zsh/.zshenv $(HOME)/.zshenv
 	ln -sfn $(ROOT)/aerospace $(CONFIG)/aerospace
+	ln -sfn $(ROOT)/paneru $(CONFIG)/paneru
 	ln -sfn $(ROOT)/sketchybar $(CONFIG)/sketchybar
+
+	# Paneru manages its own launchd registration (unlike the watchers
+	# below, there's no plist in this repo to copy). `install` is a
+	# no-op if already installed; `start` is safe to re-run too. Still
+	# requires granting Accessibility permission once by hand on first run.
+	paneru install
+	paneru start
 	ln -sfn $(ROOT)/hammerspoon $(HOME)/.hammerspoon
 	ln -sfn $(ROOT)/btop $(CONFIG)/btop
 
@@ -63,16 +71,16 @@ install-macos: setup-zsh
 	ln -sfn $(ROOT)/claude/themes $(HOME)/.claude/themes
 
 	# Theme-change watcher runs as a LaunchAgent so it works even with
-	# AeroSpace/sketchybar disabled. Copied, not symlinked: launchd is
-	# unreliable with symlinked plists. Re-run install after plist edits.
+	# sketchybar disabled. Copied, not symlinked: launchd is unreliable
+	# with symlinked plists. Re-run install after plist edits.
 	mkdir -p $(HOME)/Library/LaunchAgents
 	cp $(ROOT)/launchd/com.levynkeneng.theme-watcher.plist $(HOME)/Library/LaunchAgents/
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.theme-watcher 2>/dev/null
 	launchctl bootstrap gui/$$(id -u) $(HOME)/Library/LaunchAgents/com.levynkeneng.theme-watcher.plist
 
-	# Display watcher: enables/disables AeroSpace, sketchybar, JankyBorders
-	# and Stage Manager based on whether a screen wide enough for tiling
-	# is connected
+	# Display watcher: enables/disables sketchybar and JankyBorders based
+	# on whether a screen wide enough for them is connected (Paneru itself
+	# runs continuously as its own launchd service, see paneru/paneru.toml)
 	cp $(ROOT)/launchd/com.levynkeneng.display-watcher.plist $(HOME)/Library/LaunchAgents/
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.display-watcher 2>/dev/null
 	launchctl bootstrap gui/$$(id -u) $(HOME)/Library/LaunchAgents/com.levynkeneng.display-watcher.plist
@@ -93,6 +101,8 @@ install-windows:
 	ln -sfn $(ROOT)/wezterm/.wezterm.lua $(HOME)/.wezterm.lua
 
 uninstall:
+	-paneru stop
+	-paneru uninstall
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.theme-watcher 2>/dev/null
 	rm -f $(HOME)/Library/LaunchAgents/com.levynkeneng.theme-watcher.plist
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.display-watcher 2>/dev/null
@@ -105,6 +115,7 @@ uninstall:
 	rm -f $(CONFIG)/kitty
 	rm -f $(CONFIG)/tmux
 	rm -f $(CONFIG)/aerospace
+	rm -f $(CONFIG)/paneru
 	rm -f $(CONFIG)/sketchybar
 	rm -f $(HOME)/.hammerspoon
 	rm -f $(CONFIG)/btop

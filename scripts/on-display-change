@@ -1,12 +1,17 @@
 #!/bin/bash
 # Runs on every display configuration change, and once at login --
-# invoked by scripts/display-watcher (LaunchAgent, independent of
-# AeroSpace). Decides whether tiling is worth having from the WIDTH of
-# the biggest connected screen instead of hardcoding a specific
-# monitor: below the threshold AeroSpace, sketchybar and JankyBorders
-# are stopped and Stage Manager (macOS's own window manager, which
-# only makes sense without tiling) comes back; at or above it that
-# flips the other way.
+# invoked by scripts/display-watcher (LaunchAgent, independent of any
+# window manager). Decides whether sketchybar/borders are worth having
+# from the WIDTH of the biggest connected screen instead of hardcoding a
+# specific monitor: below the threshold they're stopped (menu bar height
+# and the notch eat too much of the built-in screen for them to be
+# useful); at or above it they're started.
+#
+# Paneru (the tiling WM, see paneru/paneru.toml) is NOT toggled here --
+# unlike AeroSpace before it, it's designed to stay useful on any screen
+# size and runs continuously as its own launchd service (`paneru
+# install`). Stage Manager is disabled unconditionally below for the same
+# reason: it fights with tiling, and tiling is now always active.
 #
 # Reference widths in points: built-in 14" = 1512, 16" = 1728; most
 # 27" externals >= 1920; the LG ultrawide = 2924. MIN_WIDTH is also
@@ -33,66 +38,34 @@ if ! [ "$WIDEST" -ge 0 ] 2>/dev/null; then
   exit 0
 fi
 
-# `aerospace enable off` only gates the CLI -- the app keeps running
-# and still tiles windows out from under Stage Manager after a
-# sleep/wake cycle (confirmed live: fully quitting it is what actually
-# stops that, disabling alone did not). So this fully quits/launches
-# the app instead of toggling its enabled flag. start-at-login is off
-# in aerospace.toml -- this script is the only thing that starts it.
-aerospace_run() {
-  if [ "$1" = on ]; then
-    pgrep -xq AeroSpace || open -ga AeroSpace
-  else
-    pkill -x AeroSpace 2>/dev/null
-  fi
-}
-
-# Stage Manager fights with tiling (both want to own window placement),
-# so it's off while AeroSpace is on and back on when AeroSpace is not.
 # killall Dock is how a GloballyEnabled change actually takes effect --
 # skip it when the value is already right so we don't restart the Dock
 # (and flash the screen) on every display event for nothing.
-stage_manager() {
-  local want=0 bool=false
-  if [ "$1" = on ]; then
-    want=1
-    bool=true
-  fi
+stage_manager_off() {
   local current
   current=$(defaults read com.apple.WindowManager GloballyEnabled 2>/dev/null)
-  if [ "$current" != "$want" ]; then
-    defaults write com.apple.WindowManager GloballyEnabled -bool "$bool"
+  if [ "$current" != "0" ]; then
+    defaults write com.apple.WindowManager GloballyEnabled -bool false
     killall Dock 2>/dev/null
   fi
 }
+stage_manager_off
 
 if [ "$WIDEST" -ge "$MIN_WIDTH" ]; then
-  log "widest screen ${WIDEST}pt >= ${MIN_WIDTH}: aerospace on, sketchybar on, borders on, stage manager off"
-  aerospace_run on
+  log "widest screen ${WIDEST}pt >= ${MIN_WIDTH}: sketchybar on, borders on"
   if ! pgrep -xq sketchybar; then
     nohup sketchybar >/dev/null 2>&1 &
   fi
   if ! pgrep -xq borders; then
     nohup "$(dirname "$0")/start-borders" >/dev/null 2>&1 &
   fi
-  stage_manager off
+  # Feeds sketchybar/plugins/paneru.sh; pointless without a bar to update
+  if ! pgrep -f 'paneru subscribe --json' >/dev/null; then
+    nohup "$(dirname "$0")/paneru-subscribe" >/dev/null 2>&1 &
+  fi
 else
-  log "widest screen ${WIDEST}pt < ${MIN_WIDTH}: aerospace off, sketchybar off, borders off, stage manager on"
-  # Captured before aerospace_run off so this only fires on the actual
-  # on->off transition, not on every re-run of this script while
-  # already in laptop-only mode (e.g. an unrelated display event during
-  # a later sleep/wake cycle)
-  was_aerospace_running=0
-  pgrep -xq AeroSpace && was_aerospace_running=1
-  aerospace_run off
+  log "widest screen ${WIDEST}pt < ${MIN_WIDTH}: sketchybar off, borders off"
   pkill -x sketchybar 2>/dev/null
   pkill -x borders 2>/dev/null
-  stage_manager on
-
-  # Windows keep whatever size/position they had while tiled on the
-  # external monitor -- hammerspoon/init.lua fills them back out to the
-  # (now solely built-in) screen
-  if [ "$was_aerospace_running" = 1 ] && pgrep -xq Hammerspoon; then
-    hs -c 'maximizeAllStandardWindows()' >/dev/null 2>&1
-  fi
+  pkill -f 'paneru subscribe --json' 2>/dev/null
 fi

@@ -1,0 +1,21 @@
+#!/bin/bash
+# Forwards Paneru's workspace/window change events onto sketchybar's own
+# event bus, so plugins/paneru.sh rebuilds the workspace pills in real
+# time -- the equivalent of what AeroSpace's own exec-on-workspace-change
+# used to do directly. `paneru subscribe --json` streams line-delimited
+# JSON and keeps the socket open, so this loops for as long as the
+# process lives.
+#
+# Runs alongside sketchybar: started/stopped by on-display-change,
+# since forwarding events is pointless without a bar to update. Matched
+# for start/stop by its own `paneru subscribe --json` command line
+# (not this wrapper script's), so a kill reliably tears down the whole
+# pipeline instead of leaving an orphaned subscriber behind.
+
+paneru subscribe --json | while IFS= read -r line; do
+  case "$line" in
+    *'"event":"virtual_workspace_changed"'*|*'"event":"windows_changed"'*)
+      sketchybar --trigger paneru_workspace_change
+      ;;
+  esac
+done

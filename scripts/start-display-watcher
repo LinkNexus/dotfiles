@@ -1,7 +1,8 @@
 #!/bin/bash
 # Entry point for the display-watcher LaunchAgent (launchd/*.plist).
-# Enables/disables AeroSpace + sketchybar depending on whether a
-# screen comfortable for tiling is connected -- see on-display-change.
+# Enables/disables sketchybar + borders (and the paneru-subscribe
+# event feed) depending on whether a screen wide enough for them is
+# connected -- see on-display-change.
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 

@@ -1,20 +1,18 @@
 -- Hammerspoon exists specifically to own the app-launcher hotkeys below.
--- scripts/on-display-change fully quits AeroSpace on the laptop screen
--- (see that script for why disabling alone wasn't enough), which means
--- AeroSpace's own key bindings disappear entirely in that mode, not
--- just stop tiling. Hammerspoon runs as its own always-on daemon
--- independent of AeroSpace/Stage Manager, so it's the one layer that
--- can offer the same shortcuts in both modes.
+-- Paneru (paneru/paneru.toml) is now the active tiling WM; AeroSpace is
+-- no longer launched anywhere (aerospace.toml/Brewfile entries are left
+-- in place dormant in case of a revert -- see git history for how this
+-- file looked while AeroSpace was live).
 --
--- The scratchpad-style ones (kitty, btop, Finder) branch on whether
--- AeroSpace is currently up: when it is, they lean on
--- aerospace-scratchpad/AeroSpace's own workspace commands; when it
--- isn't, they fall back to Hammerspoon's own window focus/minimize,
--- since there's no workspace concept once Stage Manager takes over.
+-- The scratchpad-style ones (kitty, btop, Finder) still branch on
+-- isAeroSpaceRunning(), which is now always false in practice, so they
+-- always take the Hammerspoon-native window focus/hide fallback path.
+-- That branch is left in rather than deleted, purely so a revert to
+-- AeroSpace doesn't require reconstructing this file from scratch.
 --
 -- aerospace.toml doesn't bind any of these chords -- this file is
 -- their only owner, so there's no risk of both handlers firing for
--- the same keystroke while AeroSpace is running.
+-- the same keystroke.
 
 hs.autoLaunch(true)
 hs.automaticallyCheckForUpdates(false)
@@ -141,27 +139,3 @@ hs.hotkey.bind({ 'cmd', 'alt' }, 't', toggleBtop)
 hs.hotkey.bind({ 'cmd', 'alt' }, 'e', toggleFinderScratchpad)
 hs.hotkey.bind({ 'cmd', 'alt' }, 'b', function() runAsync('open -a Zen') end)
 hs.hotkey.bind({ 'cmd', 'alt' }, 'c', focusOrSpawnMainTerminal)
-
--- Called from scripts/on-display-change (via `hs -c`) at the exact
--- moment it switches to the built-in screen -- windows don't get
--- repositioned on that transition, they just keep whatever size/
--- position they had while tiled on the external monitor, which reads
--- as tiny/misplaced on the laptop screen. Fills each standard window
--- (isStandard() excludes dialogs/panels) to its own screen. One-shot,
--- not an ongoing policy -- doesn't touch windows you open afterwards.
---
--- Global (not local) so the shell script can reach it through the IPC
--- CLI. Originally tried an hs.application.watcher on AeroSpace's
--- `terminated` event instead, but confirmed live that watcher never
--- fires for AeroSpace at all -- it's a Dock-icon-less accessory app and
--- doesn't emit the NSWorkspace notifications the watcher relies on
--- (a plain app like Calculator fires them fine). Driving this from
--- on-display-change directly is more precise anyway: it's the one
--- place that already knows the transition happened, no polling needed.
-function maximizeAllStandardWindows()
-  for _, win in ipairs(hs.window.allWindows()) do
-    if win:isStandard() then
-      win:maximize()
-    end
-  end
-end

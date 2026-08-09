@@ -1,11 +1,15 @@
 #!/bin/bash
-# ~/.config/sketchybar/plugins/aerospace.sh
+# ~/.config/sketchybar/plugins/paneru.sh
 #
-# Rebuilds one rounded "pill" (SketchyBar bracket) per AeroSpace
-# workspace that has at least one open window: a workspace number
-# plus the REAL icon of every app running in it, extracted straight
-# from each app's .app bundle (see app_icon.sh). Empty workspaces get
-# no pill at all.
+# Rebuilds one rounded "pill" (SketchyBar bracket) per Paneru virtual
+# workspace that has at least one window: a workspace number plus the
+# REAL icon of every app running in it, extracted straight from each
+# app's .app bundle (see app_icon.sh). Empty workspaces get no pill.
+#
+# Ported from the AeroSpace-based version (see git history) onto
+# Paneru's `paneru query virtual-workspaces --json`; driven by
+# scripts/paneru-subscribe instead of AeroSpace's own
+# exec-on-workspace-change.
 #
 # The rebuild is incremental: existing items are updated in place and
 # only stale ones removed, with every change batched into a SINGLE
@@ -15,8 +19,24 @@
 CONFIG_DIR="$HOME/.config/sketchybar"
 ICON_SCRIPT="$CONFIG_DIR/plugins/app_icon.sh"
 
-FOCUSED=$(aerospace list-workspaces --focused)
-NONEMPTY=$(aerospace list-workspaces --monitor focused --empty no)
+STATE=$(paneru query virtual-workspaces --json 2>/dev/null)
+[ -z "$STATE" ] && exit 0   # paneru not up yet (e.g. a startup race)
+
+# Emits "FOCUSED <n>" then one "WS <n> <app>|<app>|..." line per
+# nonempty workspace, in workspace-number order
+PARSED=$(python3 -c '
+import json, sys
+
+data = json.load(sys.stdin)
+focused = next((ws["number"] for ws in data if ws["active"]), "")
+print("FOCUSED", focused)
+for ws in sorted(data, key=lambda w: w["number"]):
+    if ws["windows"]:
+        apps = "|".join(w["app_name"] or "?" for w in ws["windows"])
+        print("WS", ws["number"], apps)
+' <<< "$STATE")
+
+FOCUSED=$(awk '$1 == "FOCUSED" { print $2 }' <<< "$PARSED")
 
 # Follow the OS appearance, like kitty's *-theme.auto.conf: macOS
 # reports AppleInterfaceStyle=Dark in dark mode and no key at all in
@@ -49,7 +69,9 @@ BRACKET_ARGS=()  # batched bracket re-adds (must come after removes)
 WANTED=()        # every item we want, in display order
 
 FIRST_PILL=1
-for ws in $NONEMPTY; do
+while IFS=' ' read -r tag ws apps; do
+  [ "$tag" = "WS" ] || continue
+
   # Invisible spacer between consecutive pills (not part of any bracket)
   if [ "$FIRST_PILL" = "1" ]; then
     FIRST_PILL=0
@@ -85,9 +107,9 @@ for ws in $NONEMPTY; do
 
   MEMBERS=("space.$ws")
 
-  APPS=$(aerospace list-windows --workspace "$ws" --format '%{app-name}' | sort -u)
   i=0
-  while IFS= read -r app; do
+  IFS='|' read -ra APP_ARR <<< "$apps"
+  for app in "${APP_ARR[@]}"; do
     [ -z "$app" ] && continue
     i=$((i + 1))
     ITEM="space.$ws.app$i"
@@ -126,7 +148,7 @@ for ws in $NONEMPTY; do
 
     WANTED+=("$ITEM")
     MEMBERS+=("$ITEM")
-  done <<< "$APPS"
+  done
 
   # Trailing breathing room inside the pill so the last icon isn't
   # flush against the rounded edge
@@ -144,12 +166,12 @@ for ws in $NONEMPTY; do
                        background.border_width=1
                        background.corner_radius=12
                        background.height=24
-                       click_script="aerospace workspace $ws")
-done
+                       click_script="paneru send-cmd window virtualnum $ws")
+done <<< "$PARSED"
 
 # Newly added items append at the end of the bar, so enforce display
-# order by chaining moves off aerospace_control (always present, first)
-PREV="aerospace_control"
+# order by chaining moves off paneru_control (always present, first)
+PREV="paneru_control"
 for item in "${WANTED[@]}"; do
   ARGS+=(--move "$item" after "$PREV")
   PREV="$item"

@@ -2,13 +2,12 @@
 # Runs every time macOS switches between light and dark mode --
 # invoked by scripts/theme-watcher, which runs as a LaunchAgent
 # (launchd/com.levynkeneng.theme-watcher.plist) independent of
-# AeroSpace/sketchybar. Add anything here that needs to react to a
-# theme change.
+# sketchybar. Add anything here that needs to react to a theme change.
 
 # Recolor the sketchybar workspace pills (skipped when sketchybar is
-# down, e.g. with AeroSpace disabled away from the external monitor)
+# down, e.g. on the built-in screen where on-display-change stops it)
 if pgrep -xq sketchybar; then
-  sketchybar --trigger aerospace_workspace_change
+  sketchybar --trigger paneru_workspace_change
 fi
 
 # Reload tmux config on the running server, same as prefix + r --

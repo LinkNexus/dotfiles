@@ -1,8 +1,8 @@
 #!/bin/bash
 # Entry point for the theme-watcher LaunchAgent (launchd/*.plist).
-# The watcher runs independently of AeroSpace/sketchybar on purpose:
-# on-theme-change also serves tmux and JankyBorders, which are still
-# wanted when AeroSpace is disabled (e.g. on the built-in screen only).
+# The watcher runs independently of sketchybar on purpose: on-theme-change
+# also serves tmux and JankyBorders, which are still wanted even when
+# sketchybar itself is stopped (e.g. on the built-in screen only).
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 

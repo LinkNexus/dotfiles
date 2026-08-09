@@ -26,7 +26,7 @@
 	<true/>
 
 	<!-- launchd's default PATH has neither nix nor homebrew; the
-	     on-display-change hook needs aerospace and sketchybar -->
+	     on-display-change hook needs paneru and sketchybar -->
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>PATH</key>

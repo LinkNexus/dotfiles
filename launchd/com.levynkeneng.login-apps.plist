@@ -19,7 +19,7 @@
 	<true/>
 
 	<!-- launchd's default PATH has neither nix nor homebrew; the
-	     script needs kitty/aerospace-scratchpad's open-btop -->
+	     script needs kitty and open-btop -->
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>PATH</key>

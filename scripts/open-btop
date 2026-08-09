@@ -1,8 +1,9 @@
 #!/bin/bash
-# Reuses the existing btop kitty window if one is already running instead
-# of spawning a duplicate every time the shortcut is pressed; on-window-
-# detected in aerospace.toml pins it to workspace 2 by its fixed title.
+# Reuses the existing btop kitty window if one is already running
+# instead of spawning a duplicate every time the shortcut is pressed.
+# Matched by its own command line rather than a WM query, so this
+# doesn't depend on which window manager (if any) is currently active.
 
-if ! aerospace list-windows --all --format '%{window-title}' | grep -qx kitty.btop; then
+if ! pgrep -f 'kitty --title kitty.btop' >/dev/null; then
     exec kitty --title kitty.btop -e btop
 fi
