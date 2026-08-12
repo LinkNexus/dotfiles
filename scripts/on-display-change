@@ -1,11 +1,13 @@
 #!/bin/bash
 # Runs on every display configuration change, and once at login --
 # invoked by scripts/display-watcher (LaunchAgent, independent of any
-# window manager). Decides whether sketchybar/borders are worth having
-# from the WIDTH of the biggest connected screen instead of hardcoding a
-# specific monitor: below the threshold they're stopped (menu bar height
-# and the notch eat too much of the built-in screen for them to be
-# useful); at or above it they're started.
+# window manager). Decides whether sketchybar is worth having from the
+# WIDTH of the biggest connected screen instead of hardcoding a specific
+# monitor: below the threshold it's stopped (menu bar height and the
+# notch eat too much of the built-in screen for it to be useful); at or
+# above it it's started. JankyBorders stays on regardless of screen size
+# -- window-focus highlighting is useful everywhere, so it's just kept
+# running unconditionally below rather than threshold-gated.
 #
 # Paneru (the tiling WM, see paneru/paneru.toml) is NOT toggled here --
 # unlike AeroSpace before it, it's designed to stay useful on any screen
@@ -51,21 +53,27 @@ stage_manager_off() {
 }
 stage_manager_off
 
+# Always on, independent of the width branch below
+if ! pgrep -xq borders; then
+  nohup "$(dirname "$0")/start-borders" >/dev/null 2>&1 &
+fi
+
 if [ "$WIDEST" -ge "$MIN_WIDTH" ]; then
-  log "widest screen ${WIDEST}pt >= ${MIN_WIDTH}: sketchybar on, borders on"
+  log "widest screen ${WIDEST}pt >= ${MIN_WIDTH}: sketchybar on"
   if ! pgrep -xq sketchybar; then
     nohup sketchybar >/dev/null 2>&1 &
-  fi
-  if ! pgrep -xq borders; then
-    nohup "$(dirname "$0")/start-borders" >/dev/null 2>&1 &
   fi
   # Feeds sketchybar/plugins/paneru.sh; pointless without a bar to update
   if ! pgrep -f 'paneru subscribe --json' >/dev/null; then
     nohup "$(dirname "$0")/paneru-subscribe" >/dev/null 2>&1 &
   fi
 else
-  log "widest screen ${WIDEST}pt < ${MIN_WIDTH}: sketchybar off, borders off"
+  log "widest screen ${WIDEST}pt < ${MIN_WIDTH}: sketchybar off"
   pkill -x sketchybar 2>/dev/null
-  pkill -x borders 2>/dev/null
   pkill -f 'paneru subscribe --json' 2>/dev/null
 fi
+
+# pkill above exits 1 when nothing matched (e.g. already off) -- without
+# this, that becomes the script's own exit code, which the Hammerspoon
+# hs.task caller in hammerspoon/watchers.lua checks to log real failures.
+exit 0

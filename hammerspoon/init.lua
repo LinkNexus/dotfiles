@@ -1,8 +1,11 @@
--- Hammerspoon exists specifically to own the app-launcher hotkeys below.
--- Paneru (paneru/paneru.toml) is now the active tiling WM; AeroSpace is
--- no longer launched anywhere (aerospace.toml/Brewfile entries are left
--- in place dormant in case of a revert -- see git history for how this
--- file looked while AeroSpace was live).
+-- Hammerspoon owns the app-launcher hotkeys below, and, as of this trial,
+-- PaperWM.spoon as well. PaperWM is being evaluated as a replacement for
+-- Paneru (paneru/paneru.toml), which had reproducible bugginess/slowness
+-- when debugging GUI apps from neovim. `paneru stop` was run by hand for
+-- this trial (service left installed, not uninstalled) -- `paneru start`
+-- brings it back if PaperWM doesn't work out. AeroSpace is still fully
+-- dormant underneath both (aerospace.toml/Brewfile entries left in place
+-- -- see git history for how this file looked while AeroSpace was live).
 --
 -- The scratchpad-style ones (kitty, btop, Finder) still branch on
 -- isAeroSpaceRunning(), which is now always false in practice, so they
@@ -15,8 +18,71 @@
 -- the same keystroke.
 
 hs.autoLaunch(true)
-hs.automaticallyCheckForUpdates(false)
+hs.automaticallyCheckForUpdates(true)
 require('hs.ipc') -- lets `hs -c '...'` talk to this instance for debugging
+
+-- Replaces scripts/theme-watcher.swift + scripts/display-watcher.swift's
+-- launchd services -- see watchers.lua. Those two launchd jobs are
+-- stopped (not uninstalled) so hooks don't fire twice; Makefile's
+-- install-macos has the bootstrap commands to bring them back.
+local watchers = require('watchers')
+
+-- PaperWM trial -- bindings deliberately mirror paneru.toml's cmd+alt
+-- hjkl leader scheme so muscle memory carries over. Not every paneru
+-- binding has a PaperWM equivalent (see paneru.toml's own comments for
+-- where the two models diverge); only the ones with a real analogue are
+-- bound here, everything else is left at no binding rather than guessing.
+PaperWM = hs.loadSpoon('PaperWM')
+
+PaperWM.window_gap = 8 -- matches paneru.toml's 4+4 per-window padding sum
+
+-- Mirrors paneru.toml's floating rules: System Settings and Finder never
+-- tile, the kitty scratchpad title stays out of the strip so cmd+alt+i's
+-- hide/show toggle above keeps working, and browser Picture-in-Picture
+-- panels stay floating/sticky instead of getting pulled into a column.
+PaperWM.window_filter = PaperWM.window_filter
+    :setAppFilter('System Settings', false)
+    :setAppFilter('Finder', false)
+    :setAppFilter('kitty', { rejectTitles = 'kitty%.scratchpad' })
+    :setAppFilter('Zen', { rejectTitles = 'Picture.in.[Pp]icture' })
+
+PaperWM:bindHotkeys({
+  focus_left = { { 'cmd', 'alt' }, 'left' },
+  focus_right = { { 'cmd', 'alt' }, 'right' },
+  focus_up = { { 'cmd', 'alt' }, 'up' },
+  focus_down = { { 'cmd', 'alt' }, 'down' },
+  swap_left = { { 'cmd', 'alt', 'shift' }, 'left' },
+  swap_right = { { 'cmd', 'alt', 'shift' }, 'right' },
+  swap_up = { { 'cmd', 'alt', 'shift' }, 'up' },
+  swap_down = { { 'cmd', 'alt', 'shift' }, 'down' },
+  decrease_width = { { 'cmd', 'alt' }, '-' },
+  increase_width = { { 'cmd', 'alt' }, '=' },
+  toggle_floating = { { 'cmd', 'alt' }, 'f' },
+  focus_floating = { { 'cmd', 'alt', 'shift' }, 'f' },
+  slurp_in = { { 'cmd', 'alt' }, ',' },
+  barf_out = { { 'cmd', 'alt', 'shift' }, ',' },
+  cycle_width = { { 'cmd', 'alt' }, 'r' },
+  full_width = { { 'cmd', 'alt' }, 'return' },
+  switch_space_1 = { { 'cmd', 'alt' }, '1' },
+  switch_space_2 = { { 'cmd', 'alt' }, '2' },
+  switch_space_3 = { { 'cmd', 'alt' }, '3' },
+  switch_space_4 = { { 'cmd', 'alt' }, '4' },
+  switch_space_5 = { { 'cmd', 'alt' }, '5' },
+  switch_space_6 = { { 'cmd', 'alt' }, '6' },
+  switch_space_7 = { { 'cmd', 'alt' }, '7' },
+  switch_space_8 = { { 'cmd', 'alt' }, '8' },
+  switch_space_9 = { { 'cmd', 'alt' }, '9' },
+  move_window_1 = { { 'cmd', 'alt', 'shift' }, '1' },
+  move_window_2 = { { 'cmd', 'alt', 'shift' }, '2' },
+  move_window_3 = { { 'cmd', 'alt', 'shift' }, '3' },
+  move_window_4 = { { 'cmd', 'alt', 'shift' }, '4' },
+  move_window_5 = { { 'cmd', 'alt', 'shift' }, '5' },
+  move_window_6 = { { 'cmd', 'alt', 'shift' }, '6' },
+  move_window_7 = { { 'cmd', 'alt', 'shift' }, '7' },
+  move_window_8 = { { 'cmd', 'alt', 'shift' }, '8' },
+  move_window_9 = { { 'cmd', 'alt', 'shift' }, '9' },
+})
+PaperWM:start()
 
 local KITTY = '/opt/homebrew/bin/kitty'
 local AEROSPACE = '/opt/homebrew/bin/aerospace'
@@ -81,7 +147,7 @@ local function toggleKittyScratchpad()
   if isAeroSpaceRunning() then
     runAsync(
       AEROSPACE_SCRATCHPAD .. " show kitty -F window-title=kitty.scratchpad || "
-        .. KITTY .. " --title kitty.scratchpad"
+      .. KITTY .. " --title kitty.scratchpad"
     )
     return
   end
