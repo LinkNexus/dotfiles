@@ -1,0 +1,27 @@
+#!/bin/bash
+# Builds SbarLua (github.com/FelixKratz/SbarLua) from source, giving
+# sketchybarrc (now a Lua script -- see sketchybar/sketchybarrc) the
+# sketchybar.so Lua module it requires. Run by `make install`.
+#
+# Idempotent: does nothing if the .so is already there, matching the
+# theme-watcher/display-watcher LaunchAgents' "compiled on demand"
+# pattern -- except this build output lives outside the repo entirely
+# (~/.local/share/sketchybar_lua), same install location the upstream
+# project's own makefile uses, so there's nothing to gitignore here.
+#
+# Re-run by hand after a sketchybar upgrade if the bar ever fails to
+# start with a Lua module-loading error -- SbarLua links against
+# sketchybar's IPC, and a mismatch after `brew upgrade` is the likely
+# cause.
+
+INSTALL_DIR="$HOME/.local/share/sketchybar_lua"
+
+if [ -f "$INSTALL_DIR/sketchybar.so" ]; then
+  exit 0
+fi
+
+TMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+git clone --quiet https://github.com/FelixKratz/SbarLua.git "$TMP_DIR" || exit 1
+make -C "$TMP_DIR" install

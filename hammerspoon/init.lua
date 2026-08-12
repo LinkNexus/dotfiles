@@ -84,6 +84,10 @@ PaperWM:bindHotkeys({
 })
 PaperWM:start()
 
+-- Feeds sketchybar/items/paperwm.lua -- needs PaperWM:start() to have
+-- already configured window_filter's floating exclusions above.
+local paperwmSketchybar = require('paperwm-sketchybar')
+
 local KITTY = '/opt/homebrew/bin/kitty'
 local AEROSPACE = '/opt/homebrew/bin/aerospace'
 local AEROSPACE_SCRATCHPAD = '/opt/homebrew/bin/aerospace-scratchpad'

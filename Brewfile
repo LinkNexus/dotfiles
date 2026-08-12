@@ -13,6 +13,10 @@ brew "cristianoliveira/tap/aerospace-scratchpad", trusted: true
 brew "felixkratz/formulae/borders", trusted: true
 # Custom macOS statusbar with shell plugin, interaction and graph support
 brew "felixkratz/formulae/sketchybar", trusted: true
+# Lua interpreter -- runs sketchybarrc via SbarLua (github.com/FelixKratz/
+# SbarLua, built from source by scripts/install-sbarlua); 5.5 confirmed
+# ABI-compatible with the Lua 5.5.0 SbarLua vendors and builds against
+brew "lua"
 # AeroSpace is an i3-like tiling window manager for macOS
 cask "nikitabobko/tap/aerospace", trusted: true
 # Tool to flash OS images to SD cards & USB drives

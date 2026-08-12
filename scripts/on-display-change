@@ -63,14 +63,9 @@ if [ "$WIDEST" -ge "$MIN_WIDTH" ]; then
   if ! pgrep -xq sketchybar; then
     nohup sketchybar >/dev/null 2>&1 &
   fi
-  # Feeds sketchybar/plugins/paneru.sh; pointless without a bar to update
-  if ! pgrep -f 'paneru subscribe --json' >/dev/null; then
-    nohup "$(dirname "$0")/paneru-subscribe" >/dev/null 2>&1 &
-  fi
 else
   log "widest screen ${WIDEST}pt < ${MIN_WIDTH}: sketchybar off"
   pkill -x sketchybar 2>/dev/null
-  pkill -f 'paneru subscribe --json' 2>/dev/null
 fi
 
 # pkill above exits 1 when nothing matched (e.g. already off) -- without

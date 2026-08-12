@@ -54,6 +54,10 @@ install-macos: setup-zsh
 	ln -sfn $(ROOT)/paneru $(CONFIG)/paneru
 	ln -sfn $(ROOT)/sketchybar $(CONFIG)/sketchybar
 
+	# sketchybarrc is a Lua script (SbarLua) -- builds the sketchybar.so
+	# module it requires into ~/.local/share/sketchybar_lua if missing
+	$(ROOT)/scripts/install-sbarlua
+
 	# Paneru manages its own launchd registration (unlike the watchers
 	# below, there's no plist in this repo to copy). `install` is a
 	# no-op if already installed; `start` is safe to re-run too. Still
