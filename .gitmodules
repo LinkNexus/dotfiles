@@ -7,3 +7,6 @@
 [submodule "hammerspoon/Spoons/PaperWM.spoon"]
 	path = hammerspoon/Spoons/PaperWM.spoon
 	url = https://github.com/mogenson/PaperWM.spoon.git
+[submodule "hammerspoon/Spoons/ScrollSpace.spoon"]
+	path = hammerspoon/Spoons/ScrollSpace.spoon
+	url = git@github.com:LinkNexus/ScrollSpace.spoon.git

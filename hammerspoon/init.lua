@@ -1,11 +1,22 @@
 -- Hammerspoon owns the app-launcher hotkeys below, and, as of this trial,
--- PaperWM.spoon as well. PaperWM is being evaluated as a replacement for
--- Paneru (paneru/paneru.toml), which had reproducible bugginess/slowness
--- when debugging GUI apps from neovim. `paneru stop` was run by hand for
--- this trial (service left installed, not uninstalled) -- `paneru start`
--- brings it back if PaperWM doesn't work out. AeroSpace is still fully
--- dormant underneath both (aerospace.toml/Brewfile entries left in place
--- -- see git history for how this file looked while AeroSpace was live).
+-- ScrollSpace.spoon as well. ScrollSpace is a from-scratch replacement for
+-- PaperWM.spoon (see hammerspoon/Spoons/ScrollSpace.spoon/CLAUDE.md for the
+-- full design) -- it fixes PaperWM's column-reflow-on-hide/show problem by
+-- keying tiling state to its own virtual workspace id instead of a real
+-- macOS Space, and folds in workspace switching (previously FlashSpace's
+-- job) and rule-based window assignment natively. PaperWM.spoon is still
+-- vendored as a submodule (not removed, in case this trial doesn't work
+-- out) but is no longer loaded/started; its former window_filter
+-- customization here has been carried over onto ScrollSpace below.
+--
+-- PaperWM itself was evaluated as a replacement for Paneru
+-- (paneru/paneru.toml), which had reproducible bugginess/slowness when
+-- debugging GUI apps from neovim. `paneru stop` was run by hand for that
+-- trial (service left installed, not uninstalled) -- `paneru start` brings
+-- it back if this whole PaperWM/ScrollSpace line doesn't work out.
+-- AeroSpace is still fully dormant underneath both (aerospace.toml/Brewfile
+-- entries left in place -- see git history for how this file looked while
+-- AeroSpace was live).
 --
 -- The scratchpad-style ones (kitty, btop, Finder) still branch on
 -- isAeroSpaceRunning(), which is now always false in practice, so they
@@ -27,66 +38,50 @@ require('hs.ipc') -- lets `hs -c '...'` talk to this instance for debugging
 -- install-macos has the bootstrap commands to bring them back.
 local watchers = require('watchers')
 
--- PaperWM trial -- bindings deliberately mirror paneru.toml's cmd+alt
--- hjkl leader scheme so muscle memory carries over. Not every paneru
--- binding has a PaperWM equivalent (see paneru.toml's own comments for
--- where the two models diverge); only the ones with a real analogue are
--- bound here, everything else is left at no binding rather than guessing.
-PaperWM = hs.loadSpoon('PaperWM')
+-- ScrollSpace trial -- bindings deliberately mirror the PaperWM trial's
+-- cmd+alt hjkl leader scheme (itself carried over from paneru.toml) so
+-- muscle memory keeps carrying over, including slurp_in/barf_out
+-- (cmd+alt+,/cmd+alt+shift+,) for stacking a window into the column to its
+-- left / popping it back out into its own column -- the way to tile
+-- vertically. decrease_width/increase_width/focus_floating had no
+-- ScrollSpace equivalent to bind -- see the spoon's CLAUDE.md "explicitly
+-- out of scope for v1" section -- so those chords are simply unbound for
+-- now rather than guessing at a replacement. New to this trial:
+-- switch_workspace_1..9/move_window_1..9 (virtual workspaces) and
+-- toggle_scratchpad/set_scratchpad (a single scratchpad window, unrelated
+-- to the kitty/btop/Finder hide-app scratchpads below -- those are a
+-- separate mechanism).
+ScrollSpace = hs.loadSpoon('ScrollSpace')
 
-PaperWM.window_gap = 8 -- matches paneru.toml's 4+4 per-window padding sum
+ScrollSpace.window_gap = 8 -- matches paneru.toml's 4+4 per-window padding sum
 
--- Mirrors paneru.toml's floating rules: System Settings and Finder never
--- tile, the kitty scratchpad title stays out of the strip so cmd+alt+i's
--- hide/show toggle above keeps working, and browser Picture-in-Picture
--- panels stay floating/sticky instead of getting pulled into a column.
-PaperWM.window_filter = PaperWM.window_filter
+-- Carried over from the PaperWM trial's own equivalent filter: System
+-- Settings and Finder never tile, the kitty scratchpad title stays out of
+-- the strip so cmd+alt+i's hide/show toggle below keeps working, and
+-- browser Picture-in-Picture panels stay floating/sticky instead of
+-- getting pulled into a column. Kept as a title-based window_filter
+-- exclusion (proven to work here already) rather than relying solely on
+-- ScrollSpace's own best-effort subrole-based PiP detection.
+ScrollSpace.window_filter = ScrollSpace.window_filter
     :setAppFilter('System Settings', false)
     :setAppFilter('Finder', false)
     :setAppFilter('kitty', { rejectTitles = 'kitty%.scratchpad' })
     :setAppFilter('Zen', { rejectTitles = 'Picture.in.[Pp]icture' })
 
-PaperWM:bindHotkeys({
-  focus_left = { { 'cmd', 'alt' }, 'left' },
-  focus_right = { { 'cmd', 'alt' }, 'right' },
-  focus_up = { { 'cmd', 'alt' }, 'up' },
-  focus_down = { { 'cmd', 'alt' }, 'down' },
-  swap_left = { { 'cmd', 'alt', 'shift' }, 'left' },
-  swap_right = { { 'cmd', 'alt', 'shift' }, 'right' },
-  swap_up = { { 'cmd', 'alt', 'shift' }, 'up' },
-  swap_down = { { 'cmd', 'alt', 'shift' }, 'down' },
-  decrease_width = { { 'cmd', 'alt' }, '-' },
-  increase_width = { { 'cmd', 'alt' }, '=' },
-  toggle_floating = { { 'cmd', 'alt' }, 'f' },
-  focus_floating = { { 'cmd', 'alt', 'shift' }, 'f' },
-  slurp_in = { { 'cmd', 'alt' }, ',' },
-  barf_out = { { 'cmd', 'alt', 'shift' }, ',' },
-  cycle_width = { { 'cmd', 'alt' }, 'r' },
-  full_width = { { 'cmd', 'alt' }, 'return' },
-  switch_space_1 = { { 'cmd', 'alt' }, '1' },
-  switch_space_2 = { { 'cmd', 'alt' }, '2' },
-  switch_space_3 = { { 'cmd', 'alt' }, '3' },
-  switch_space_4 = { { 'cmd', 'alt' }, '4' },
-  switch_space_5 = { { 'cmd', 'alt' }, '5' },
-  switch_space_6 = { { 'cmd', 'alt' }, '6' },
-  switch_space_7 = { { 'cmd', 'alt' }, '7' },
-  switch_space_8 = { { 'cmd', 'alt' }, '8' },
-  switch_space_9 = { { 'cmd', 'alt' }, '9' },
-  move_window_1 = { { 'cmd', 'alt', 'shift' }, '1' },
-  move_window_2 = { { 'cmd', 'alt', 'shift' }, '2' },
-  move_window_3 = { { 'cmd', 'alt', 'shift' }, '3' },
-  move_window_4 = { { 'cmd', 'alt', 'shift' }, '4' },
-  move_window_5 = { { 'cmd', 'alt', 'shift' }, '5' },
-  move_window_6 = { { 'cmd', 'alt', 'shift' }, '6' },
-  move_window_7 = { { 'cmd', 'alt', 'shift' }, '7' },
-  move_window_8 = { { 'cmd', 'alt', 'shift' }, '8' },
-  move_window_9 = { { 'cmd', 'alt', 'shift' }, '9' },
-})
-PaperWM:start()
+-- Assign windows to workspaces at creation time. Empty for now -- add
+-- entries here once there's an actual multi-workspace layout in mind, e.g.
+-- ScrollSpace.rules = { { app = 'kitty', title = '^btop', workspace = 2 } }
 
--- Feeds sketchybar/items/paperwm.lua -- needs PaperWM:start() to have
--- already configured window_filter's floating exclusions above.
-local paperwmSketchybar = require('paperwm-sketchybar')
+-- Copy of ScrollSpace.default_hotkeys with center_window dropped: its
+-- default chord (cmd+alt+c) collides with focusOrSpawnMainTerminal below.
+local scrollspace_hotkeys = {}
+for action, chord in pairs(ScrollSpace.default_hotkeys) do
+  if action ~= 'center_window' then
+    scrollspace_hotkeys[action] = chord
+  end
+end
+ScrollSpace:bindHotkeys(scrollspace_hotkeys)
+ScrollSpace:start()
 
 local KITTY = '/opt/homebrew/bin/kitty'
 local AEROSPACE = '/opt/homebrew/bin/aerospace'
