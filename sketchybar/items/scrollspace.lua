@@ -1,29 +1,30 @@
--- ~/.config/sketchybar/items/paperwm.lua
+-- ~/.config/sketchybar/items/scrollspace.lua
 --
--- Renders one rounded "pill" (SketchyBar bracket) per macOS Space (on
--- the main screen) that has at least one real window: a space number
--- plus the REAL icon of every app running in it, extracted via
--- app_icon.sh. Empty spaces get no pill.
+-- Renders one rounded "pill" (SketchyBar bracket) per ScrollSpace
+-- workspace that has at least one window: a workspace number plus the
+-- REAL icon of every app in it, extracted via app_icon.sh. Empty
+-- workspaces get no pill.
 --
--- Ported from the Paneru-based bash version (see git history) onto
--- PaperWM + SbarLua: hammerspoon/paperwm-sketchybar.lua writes
--- STATE_FILE and triggers paperwm_workspace_change on every space/
--- window change (plus its own 5s poll safety net) -- same role
--- scripts/paneru-subscribe played before.
+-- Ported from items/paperwm.lua (see git history at d6c36dc): same
+-- rebuild/bracket/theme-inversion approach, "space" renamed to
+-- "workspace" throughout. hammerspoon/scrollspace-sketchybar.lua writes
+-- STATE_FILE and triggers scrollspace_workspace_change on every
+-- ScrollSpace state change (via ScrollSpace.state.onChange()) -- same
+-- role hammerspoon/paperwm-sketchybar.lua played before, just without
+-- needing its own poll safety net since ScrollSpace already fires a
+-- save on every state-mutating action.
 --
--- SbarLua has no "move" primitive (unlike the bash CLI's --move) and no
--- way to edit an existing bracket's membership, so rather than diffing
--- against previous state, every rebuild removes everything it created
--- last time and re-adds everything fresh, in order -- creation order is
--- display order, which sidesteps needing "move" at all. Wrapped in
--- begin_config/end_config so a rebuild is one atomic message to
--- sketchybar, same reason the bash version batched everything into a
--- single `sketchybar` invocation: switching spaces should never show an
--- empty or half-built bar.
+-- SbarLua has no "move" primitive and no way to edit an existing
+-- bracket's membership, so rather than diffing against previous state,
+-- every rebuild removes everything it created last time and re-adds
+-- everything fresh, in order -- creation order is display order, which
+-- sidesteps needing "move" at all. Wrapped in begin_config/end_config
+-- so a rebuild is one atomic message to sketchybar: switching
+-- workspaces should never show an empty or half-built bar.
 
 local CONFIG_DIR = os.getenv('HOME') .. '/.config/sketchybar'
 local ICON_SCRIPT = CONFIG_DIR .. '/plugins/app_icon.sh'
-local STATE_FILE = '/tmp/paperwm-state.txt'
+local STATE_FILE = '/tmp/scrollspace-state.txt'
 
 local function shell(cmd)
   local proc = io.popen(cmd)
@@ -55,12 +56,12 @@ local function isDarkTheme()
   return shell('defaults read -g AppleInterfaceStyle 2>/dev/null') == 'Dark'
 end
 
-sbar.add('event', 'paperwm_workspace_change')
+sbar.add('event', 'scrollspace_workspace_change')
 
-local control = sbar.add('item', 'paperwm_control', { drawing = false })
+local control = sbar.add('item', 'scrollspace_control', { drawing = false })
 
--- number -> app count, from the last rebuild -- exactly what's needed
--- to know which item names to remove before rebuilding fresh
+-- workspace number -> app count, from the last rebuild -- exactly what's
+-- needed to know which item names to remove before rebuilding fresh
 local previous = {}
 
 local function rebuild()
@@ -72,17 +73,17 @@ local function rebuild()
   local wanted = {}
   local order = {}
   for line in f:lines() do
-    local number, id, active, apps = line:match('^(%d+) (%d+) (%d) (.*)$')
-    if number then
+    local workspace, active, apps = line:match('^(%d+) (%d) (.*)$')
+    if workspace then
       local appList = {}
       for app in (apps .. '|'):gmatch('([^|]*)|') do
         if app ~= '' then
           table.insert(appList, app)
         end
       end
-      number = tonumber(number)
-      wanted[number] = { id = tonumber(id), active = (active == '1'), apps = appList }
-      table.insert(order, number)
+      workspace = tonumber(workspace)
+      wanted[workspace] = { active = (active == '1'), apps = appList }
+      table.insert(order, workspace)
     end
   end
   f:close()
@@ -102,19 +103,19 @@ local function rebuild()
 
   sbar.begin_config()
 
-  for number, appCount in pairs(previous) do
-    sbar.remove('space_bracket.' .. number)
-    sbar.remove('space.' .. number)
-    sbar.remove('space.' .. number .. '.gap')
+  for workspace, appCount in pairs(previous) do
+    sbar.remove('workspace_bracket.' .. workspace)
+    sbar.remove('workspace.' .. workspace)
+    sbar.remove('workspace.' .. workspace .. '.gap')
     for i = 1, appCount do
-      sbar.remove('space.' .. number .. '.app' .. i)
+      sbar.remove('workspace.' .. workspace .. '.app' .. i)
     end
   end
 
   local newPrevious = {}
   local firstPill = true
-  for _, number in ipairs(order) do
-    local ws = wanted[number]
+  for _, workspace in ipairs(order) do
+    local ws = wanted[workspace]
     local focused = ws.active
     local numColor = focused and F_NUM or U_NUM
     local pillColor = focused and F_PILL or U_PILL
@@ -122,7 +123,7 @@ local function rebuild()
 
     -- Invisible spacer between consecutive pills (not part of any bracket)
     if not firstPill then
-      sbar.add('item', 'space.' .. number .. '.gap', {
+      sbar.add('item', 'workspace.' .. workspace .. '.gap', {
         position = 'center',
         width = 8,
         icon = { drawing = false },
@@ -132,10 +133,10 @@ local function rebuild()
     end
     firstPill = false
 
-    local numberItem = sbar.add('item', 'space.' .. number, {
+    local numberItem = sbar.add('item', 'workspace.' .. workspace, {
       position = 'center',
       icon = {
-        string = tostring(number),
+        string = tostring(workspace),
         drawing = true,
         font = 'Helvetica Neue:Bold:11.0',
         color = numColor,
@@ -150,7 +151,7 @@ local function rebuild()
     for i, app in ipairs(ws.apps) do
       local iconPng = shell(string.format("%s '%s'", ICON_SCRIPT, app))
 
-      -- Unfocused spaces get the 35%-opacity variant of each icon
+      -- Unfocused workspaces get the 35%-opacity variant of each icon
       if iconPng and iconPng ~= '' and not focused then
         local dim = iconPng:gsub('%.png$', '_dim.png')
         if fileExists(dim) then
@@ -158,7 +159,7 @@ local function rebuild()
         end
       end
 
-      local itemName = 'space.' .. number .. '.app' .. i
+      local itemName = 'workspace.' .. workspace .. '.app' .. i
       local rightPad = (i == #ws.apps) and 8 or 2
       local appItem
       if iconPng and iconPng ~= '' then
@@ -200,8 +201,7 @@ local function rebuild()
       table.insert(members, appItem.name)
     end
 
-    local spaceId = ws.id
-    local bracket = sbar.add('bracket', 'space_bracket.' .. number, members, {
+    local bracket = sbar.add('bracket', 'workspace_bracket.' .. workspace, members, {
       background = {
         drawing = true,
         color = pillColor,
@@ -212,15 +212,15 @@ local function rebuild()
       },
     })
     bracket:subscribe('mouse.clicked', function()
-      sbar.exec("hs -c 'hs.spaces.gotoSpace(" .. spaceId .. ")'")
+      sbar.exec("hs -c 'ScrollSpace.workspace.switchWorkspace(" .. workspace .. ")'")
     end)
 
-    newPrevious[number] = #ws.apps
+    newPrevious[workspace] = #ws.apps
   end
   previous = newPrevious
 
   sbar.end_config()
 end
 
-control:subscribe('paperwm_workspace_change', rebuild)
+control:subscribe('scrollspace_workspace_change', rebuild)
 rebuild() -- draw the initial state immediately, don't wait for the first change

@@ -83,6 +83,11 @@ end
 ScrollSpace:bindHotkeys(scrollspace_hotkeys)
 ScrollSpace:start()
 
+-- Feeds sketchybar/items/scrollspace.lua's workspace pills. Needs
+-- ScrollSpace to already be the loaded global (reads ScrollSpace.state
+-- directly) and started (writes its initial state immediately on load).
+require('scrollspace-sketchybar')
+
 local KITTY = '/opt/homebrew/bin/kitty'
 local AEROSPACE = '/opt/homebrew/bin/aerospace'
 local AEROSPACE_SCRATCHPAD = '/opt/homebrew/bin/aerospace-scratchpad'
