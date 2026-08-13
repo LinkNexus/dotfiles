@@ -68,9 +68,17 @@ ScrollSpace.window_filter = ScrollSpace.window_filter
     :setAppFilter('kitty', { rejectTitles = 'kitty%.scratchpad' })
     :setAppFilter('Zen', { rejectTitles = 'Picture.in.[Pp]icture' })
 
--- Assign windows to workspaces at creation time. Empty for now -- add
--- entries here once there's an actual multi-workspace layout in mind, e.g.
--- ScrollSpace.rules = { { app = 'kitty', title = '^btop', workspace = 2 } }
+-- Assign windows to workspaces at creation time. Workspace 1: browser +
+-- main terminal (daily driver). Workspace 2: mail + task manager. kitty's
+-- scratchpad title is already excluded entirely by the window_filter
+-- above, so it's untouched by these rules and stays on its separate
+-- app-hide/unhide toggle (cmd+alt+i).
+ScrollSpace.rules = {
+  { app = 'kitty', title = '^kitty%.main$', workspace = 1 },
+  { app = 'Zen', workspace = 1 },
+  { app = 'kitty', title = '^kitty%.btop$', workspace = 2 },
+  { app = 'Thunderbird', workspace = 2 },
+}
 
 -- Copy of ScrollSpace.default_hotkeys with center_window dropped: its
 -- default chord (cmd+alt+c) collides with focusOrSpawnMainTerminal below.

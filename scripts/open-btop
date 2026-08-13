@@ -5,5 +5,9 @@
 # doesn't depend on which window manager (if any) is currently active.
 
 if ! pgrep -f 'kitty --title kitty.btop' >/dev/null; then
-    exec kitty --title kitty.btop -e btop
+    # Absolute path, not bare `kitty` -- this runs via hs.task.new from
+    # Hammerspoon, which doesn't inherit an interactive shell's PATH
+    # (Hammerspoon.app never sources .zshrc), so PATH resolution fails
+    # silently here even though it works fine from a normal terminal.
+    exec /opt/homebrew/bin/kitty --title kitty.btop -e btop
 fi
