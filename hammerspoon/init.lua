@@ -80,14 +80,20 @@ ScrollSpace.rules = {
   { app = 'Thunderbird', workspace = 2 },
 }
 
--- Copy of ScrollSpace.default_hotkeys with center_window dropped: its
--- default chord (cmd+alt+c) collides with focusOrSpawnMainTerminal below.
+-- Copy of ScrollSpace.default_hotkeys with center_window dropped (its
+-- default chord, cmd+alt+c, collides with focusOrSpawnMainTerminal
+-- below) and toggle_scratchpad/set_scratchpad remapped off cmd+alt+s
+-- (collides with Zen Browser's own sidebar toggle -- confirmed live,
+-- Hammerspoon's global hotkey claims the keystroke before Zen ever
+-- sees it).
 local scrollspace_hotkeys = {}
 for action, chord in pairs(ScrollSpace.default_hotkeys) do
   if action ~= 'center_window' then
     scrollspace_hotkeys[action] = chord
   end
 end
+scrollspace_hotkeys.toggle_scratchpad = { { 'cmd', 'alt' }, '`' }
+scrollspace_hotkeys.set_scratchpad = { { 'cmd', 'alt', 'shift' }, '`' }
 ScrollSpace:bindHotkeys(scrollspace_hotkeys)
 ScrollSpace:start()
 
