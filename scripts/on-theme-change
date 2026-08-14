@@ -7,7 +7,7 @@
 # Recolor the sketchybar workspace pills (skipped when sketchybar is
 # down, e.g. on the built-in screen where on-display-change stops it)
 if pgrep -xq sketchybar; then
-  sketchybar --trigger paperwm_workspace_change
+  sketchybar --trigger scrollspace_workspace_change
 fi
 
 # Reload tmux config on the running server, same as prefix + r --
