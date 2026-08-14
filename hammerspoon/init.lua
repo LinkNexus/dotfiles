@@ -18,7 +18,7 @@
 -- entries left in place -- see git history for how this file looked while
 -- AeroSpace was live).
 --
--- The scratchpad-style ones (kitty, btop, Finder) still branch on
+-- The scratchpad-style ones (kitty, Finder) still branch on
 -- isAeroSpaceRunning(), which is now always false in practice, so they
 -- always take the Hammerspoon-native window focus/hide fallback path.
 -- That branch is left in rather than deleted, purely so a revert to
@@ -49,8 +49,11 @@ local watchers = require('watchers')
 -- now rather than guessing at a replacement. New to this trial:
 -- switch_workspace_1..9/move_window_1..9 (virtual workspaces) and
 -- toggle_scratchpad/set_scratchpad (a single scratchpad window, unrelated
--- to the kitty/btop/Finder hide-app scratchpads below -- those are a
--- separate mechanism).
+-- to the kitty/Finder hide-app scratchpads below -- those are a
+-- separate mechanism). btop used to have its own hide-app toggle here
+-- too (cmd+alt+t) but that's gone now that it's a normal ScrollSpace-
+-- tracked window on workspace 2 -- cmd+alt+2 is how you get to it,
+-- rather than two mechanisms fighting over the same window's visibility.
 ScrollSpace = hs.loadSpoon('ScrollSpace')
 
 ScrollSpace.window_gap = 8 -- matches paneru.toml's 4+4 per-window padding sum
@@ -105,7 +108,6 @@ require('scrollspace-sketchybar')
 local KITTY = '/opt/homebrew/bin/kitty'
 local AEROSPACE = '/opt/homebrew/bin/aerospace'
 local AEROSPACE_SCRATCHPAD = '/opt/homebrew/bin/aerospace-scratchpad'
-local OPEN_BTOP = os.getenv('HOME') .. '/dotfiles/scripts/open-btop'
 
 local function isAeroSpaceRunning()
   return hs.application.get('AeroSpace') ~= nil
@@ -145,8 +147,8 @@ end
 -- which is exactly the case on-display-change puts you in when
 -- AeroSpace is down. hide() works reliably in that same mode. Safe to
 -- hide the whole app rather than just the one window because each kitty
--- scratchpad/btop/main instance is its own separate process (confirmed
--- via hs.application.applicationsForBundleID) -- the only app this
+-- scratchpad/main instance is its own separate process (confirmed via
+-- hs.application.applicationsForBundleID) -- the only app this
 -- shares state across windows for is Finder, where hiding puts away
 -- any other Finder windows you have open too.
 local function focusOrPutAway(win)
@@ -178,20 +180,6 @@ local function toggleKittyScratchpad()
   end
 end
 
-local function toggleBtop()
-  if isAeroSpaceRunning() then
-    runAsync(AEROSPACE .. ' workspace 2 && ' .. OPEN_BTOP)
-    return
-  end
-
-  local win = findWindowByTitle('kitty.btop')
-  if win then
-    focusOrPutAway(win)
-  else
-    runAsync(OPEN_BTOP)
-  end
-end
-
 local function toggleFinderScratchpad()
   if isAeroSpaceRunning() then
     runAsync(AEROSPACE_SCRATCHPAD .. ' show Finder || open -a Finder')
@@ -207,8 +195,8 @@ local function toggleFinderScratchpad()
 end
 
 -- kitty.main is the plain daily-driver window scripts/open-login-apps
--- opens at login; unlike the scratchpad/btop windows it's never hidden,
--- just brought to front (or spawned if you've closed it).
+-- opens at login; unlike the scratchpad windows it's never hidden, just
+-- brought to front (or spawned if you've closed it).
 local function focusOrSpawnMainTerminal()
   local win = findWindowByTitle('kitty.main')
   if win then
@@ -219,7 +207,6 @@ local function focusOrSpawnMainTerminal()
 end
 
 hs.hotkey.bind({ 'cmd', 'alt' }, 'i', toggleKittyScratchpad)
-hs.hotkey.bind({ 'cmd', 'alt' }, 't', toggleBtop)
 hs.hotkey.bind({ 'cmd', 'alt' }, 'e', toggleFinderScratchpad)
 hs.hotkey.bind({ 'cmd', 'alt' }, 'b', function() runAsync('open -a Zen') end)
 hs.hotkey.bind({ 'cmd', 'alt' }, 'c', focusOrSpawnMainTerminal)
