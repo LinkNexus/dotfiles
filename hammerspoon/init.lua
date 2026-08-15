@@ -3,30 +3,20 @@
 -- PaperWM.spoon (see hammerspoon/Spoons/ScrollSpace.spoon/CLAUDE.md for the
 -- full design) -- it fixes PaperWM's column-reflow-on-hide/show problem by
 -- keying tiling state to its own virtual workspace id instead of a real
--- macOS Space, and folds in workspace switching (previously FlashSpace's
--- job) and rule-based window assignment natively. PaperWM.spoon is still
--- vendored as a submodule (not removed, in case this trial doesn't work
--- out) but is no longer loaded/started; its former window_filter
--- customization here has been carried over onto ScrollSpace below.
+-- macOS Space, and folds in workspace switching and rule-based window
+-- assignment natively. PaperWM.spoon is still vendored as a submodule (not
+-- removed, in case this trial doesn't work out) but is no longer
+-- loaded/started; its former window_filter customization here has been
+-- carried over onto ScrollSpace below.
 --
 -- PaperWM itself was evaluated as a replacement for Paneru
 -- (paneru/paneru.toml), which had reproducible bugginess/slowness when
 -- debugging GUI apps from neovim. `paneru stop` was run by hand for that
 -- trial (service left installed, not uninstalled) -- `paneru start` brings
 -- it back if this whole PaperWM/ScrollSpace line doesn't work out.
--- AeroSpace is still fully dormant underneath both (aerospace.toml/Brewfile
--- entries left in place -- see git history for how this file looked while
--- AeroSpace was live).
 --
--- The scratchpad-style ones (kitty, Finder) still branch on
--- isAeroSpaceRunning(), which is now always false in practice, so they
--- always take the Hammerspoon-native window focus/hide fallback path.
--- That branch is left in rather than deleted, purely so a revert to
--- AeroSpace doesn't require reconstructing this file from scratch.
---
--- aerospace.toml doesn't bind any of these chords -- this file is
--- their only owner, so there's no risk of both handlers firing for
--- the same keystroke.
+-- AeroSpace and FlashSpace are both fully retired -- no config, casks, or
+-- fallback code for either remains in this repo.
 
 hs.autoLaunch(true)
 hs.automaticallyCheckForUpdates(true)
@@ -56,7 +46,7 @@ local watchers = require('watchers')
 -- rather than two mechanisms fighting over the same window's visibility.
 ScrollSpace = hs.loadSpoon('ScrollSpace')
 
-ScrollSpace.window_gap = 8 -- matches paneru.toml's 4+4 per-window padding sum
+ScrollSpace.window_gap = 12 -- matches paneru.toml's 4+4 per-window padding sum
 
 -- Carried over from the PaperWM trial's own equivalent filter: System
 -- Settings and Finder never tile, the kitty scratchpad title stays out of
@@ -77,9 +67,9 @@ ScrollSpace.window_filter = ScrollSpace.window_filter
 -- above, so it's untouched by these rules and stays on its separate
 -- app-hide/unhide toggle (cmd+alt+i).
 ScrollSpace.rules = {
-  { app = 'kitty', title = '^kitty%.main$', workspace = 1 },
-  { app = 'Zen', workspace = 1 },
-  { app = 'kitty', title = '^kitty%.btop$', workspace = 2 },
+  { app = 'kitty',       title = '^kitty%.main$', workspace = 1 },
+  { app = 'Zen',         workspace = 1 },
+  { app = 'kitty',       title = '^kitty%.btop$', workspace = 2 },
   { app = 'Thunderbird', workspace = 2 },
 }
 
@@ -106,18 +96,10 @@ ScrollSpace:start()
 require('scrollspace-sketchybar')
 
 local KITTY = '/opt/homebrew/bin/kitty'
-local AEROSPACE = '/opt/homebrew/bin/aerospace'
-local AEROSPACE_SCRATCHPAD = '/opt/homebrew/bin/aerospace-scratchpad'
 
-local function isAeroSpaceRunning()
-  return hs.application.get('AeroSpace') ~= nil
-end
-
--- hs.execute always blocks the main thread until the command exits --
--- fine for instant things, but aerospace-scratchpad round-trips
--- through AeroSpace's socket and once visibly hung the entire
--- Hammerspoon event loop (every hotkey, not just this one) long enough
--- to time out its own IPC. hs.task runs the shell out-of-band instead.
+-- hs.execute always blocks the main thread until the command exits;
+-- hs.task runs the shell out-of-band instead so a slow spawn can't hang
+-- every other hotkey along with it.
 local function runAsync(shellCommand)
   hs.task.new('/bin/sh', nil, { '-c', shellCommand }):start()
 end
@@ -136,18 +118,14 @@ local function findWindowByApp(appName)
   return app and app:mainWindow() or nil
 end
 
--- Mirrors aerospace-scratchpad's own show semantics (github.com/
--- cristianoliveira/aerospace-scratchpad) so the shortcut feels the same
--- whether AeroSpace is driving it or this fallback is: focus it if it's
--- not the frontmost window, otherwise put it away.
+-- Focus it if it's not the frontmost window, otherwise put it away.
 --
 -- Uses app:hide()/:unhide(), not win:minimize() -- confirmed live that
 -- AXMinimized is a silent no-op here (on kitty *and* native Finder
--- windows alike) whenever Stage Manager is the active window manager,
--- which is exactly the case on-display-change puts you in when
--- AeroSpace is down. hide() works reliably in that same mode. Safe to
--- hide the whole app rather than just the one window because each kitty
--- scratchpad/main instance is its own separate process (confirmed via
+-- windows alike) whenever Stage Manager is the active window manager.
+-- hide() works reliably in that same mode. Safe to hide the whole app
+-- rather than just the one window because each kitty scratchpad/main
+-- instance is its own separate process (confirmed via
 -- hs.application.applicationsForBundleID) -- the only app this
 -- shares state across windows for is Finder, where hiding puts away
 -- any other Finder windows you have open too.
@@ -164,14 +142,6 @@ local function focusOrPutAway(win)
 end
 
 local function toggleKittyScratchpad()
-  if isAeroSpaceRunning() then
-    runAsync(
-      AEROSPACE_SCRATCHPAD .. " show kitty -F window-title=kitty.scratchpad || "
-      .. KITTY .. " --title kitty.scratchpad"
-    )
-    return
-  end
-
   local win = findWindowByTitle('kitty.scratchpad')
   if win then
     focusOrPutAway(win)
@@ -181,11 +151,6 @@ local function toggleKittyScratchpad()
 end
 
 local function toggleFinderScratchpad()
-  if isAeroSpaceRunning() then
-    runAsync(AEROSPACE_SCRATCHPAD .. ' show Finder || open -a Finder')
-    return
-  end
-
   local win = findWindowByApp('Finder')
   if win then
     focusOrPutAway(win)
