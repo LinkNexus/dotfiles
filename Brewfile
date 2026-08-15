@@ -1,24 +1,12 @@
-tap "cristianoliveira/tap"
 tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
-tap "nikitabobko/tap"
 # Deep clean and optimize your Mac
 brew "mole"
 # Paste PNG into files
 brew "pngpaste"
-# Sliding, tiling window manager for macOS (trial replacement for AeroSpace)
-brew "paneru"
-# AeroSpace scratchpad - Scratchpad for AeroSpace WM
-brew "cristianoliveira/tap/aerospace-scratchpad", trusted: true
 # A window border system for macOS
 brew "felixkratz/formulae/borders", trusted: true
 # Custom macOS statusbar with shell plugin, interaction and graph support
 brew "felixkratz/formulae/sketchybar", trusted: true
-# Lua interpreter -- runs sketchybarrc via SbarLua (github.com/FelixKratz/
-# SbarLua, built from source by scripts/install-sbarlua); 5.5 confirmed
-# ABI-compatible with the Lua 5.5.0 SbarLua vendors and builds against
-brew "lua"
-# AeroSpace is an i3-like tiling window manager for macOS
-cask "nikitabobko/tap/aerospace", trusted: true
 # Tool to flash OS images to SD cards & USB drives
 cask "balenaetcher"
 # Display management tool
@@ -55,6 +43,10 @@ cask "tailscale-app"
 cask "thunderbird"
 # Open-source code editor
 cask "visual-studio-code@insiders"
+# Multimedia player
+cask "vlc"
+# Multiplayer code editor
+cask "zed"
 # Gecko based web browser
 cask "zen"
 vscode "anthropic.claude-code"
