@@ -50,7 +50,6 @@ install-macos: setup-zsh
 	ln -sfn $(ROOT)/tmux $(CONFIG)/tmux
 	ln -sfn $(ROOT)/wezterm/.wezterm.lua $(HOME)/.wezterm.lua
 	ln -sfn $(ROOT)/zsh/.zshenv $(HOME)/.zshenv
-	ln -sfn $(ROOT)/aerospace $(CONFIG)/aerospace
 	ln -sfn $(ROOT)/paneru $(CONFIG)/paneru
 	ln -sfn $(ROOT)/sketchybar $(CONFIG)/sketchybar
 
@@ -89,8 +88,7 @@ install-macos: setup-zsh
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.display-watcher 2>/dev/null
 	launchctl bootstrap gui/$$(id -u) $(HOME)/Library/LaunchAgents/com.levynkeneng.display-watcher.plist
 
-	# Opens the daily app set (kitty, Zen, Thunderbird, btop) once per
-	# login, independent of AeroSpace's on/off state for the session
+	# Opens the daily app set (kitty, Zen, Thunderbird, btop) once per login
 	cp $(ROOT)/launchd/com.levynkeneng.login-apps.plist $(HOME)/Library/LaunchAgents/
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.login-apps 2>/dev/null
 	launchctl bootstrap gui/$$(id -u) $(HOME)/Library/LaunchAgents/com.levynkeneng.login-apps.plist
@@ -118,7 +116,6 @@ uninstall:
 	rm -f $(CONFIG)/ghostty
 	rm -f $(CONFIG)/kitty
 	rm -f $(CONFIG)/tmux
-	rm -f $(CONFIG)/aerospace
 	rm -f $(CONFIG)/paneru
 	rm -f $(CONFIG)/sketchybar
 	rm -f $(HOME)/.hammerspoon
