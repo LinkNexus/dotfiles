@@ -114,11 +114,28 @@ logTo(DISPLAY_LOG, 'watcher (re)started, initial widest = ' .. lastWidth .. 'pt'
 -- startup call, so a fresh login/reload lands in the right state.
 runHook(DISPLAY_LOG, ON_DISPLAY_CHANGE)
 
--- ── Wake safety net for both ───────────────────────────────────
+-- ── Wake safety net for both, plus hotkey-recovery reload ───────
+-- macOS can silently disable Hammerspoon's global hotkey event taps
+-- after sleep or a period of screen-timeout inactivity -- Hammerspoon
+-- doesn't detect or recover from this on its own, so hotkeys just go
+-- dead until something re-registers them. hs.reload() does that
+-- (confirmed live: this is exactly the manual workaround that's been
+-- fixing it). Debounced since systemDidWake and screensDidWake both
+-- fire on a full-sleep wake -- one reload covers both. reload() also
+-- re-runs the theme/display checks below from scratch (currentStyle()/
+-- widestScreen() are recomputed at load time), so calling checkTheme/
+-- scheduleDisplayCheck directly on wake would be redundant now.
+local reloadDebounce = nil
+local function scheduleReload()
+  if reloadDebounce then
+    reloadDebounce:stop()
+  end
+  reloadDebounce = hs.timer.doAfter(1, function() hs.reload() end)
+end
+
 local wakeWatcher = hs.caffeinate.watcher.new(function(event)
   if event == hs.caffeinate.watcher.systemDidWake or event == hs.caffeinate.watcher.screensDidWake then
-    checkTheme('wake')
-    scheduleDisplayCheck('wake')
+    scheduleReload()
   end
 end)
 wakeWatcher:start()
