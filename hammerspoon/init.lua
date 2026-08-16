@@ -95,6 +95,11 @@ ScrollSpace:start()
 -- directly) and started (writes its initial state immediately on load).
 require('scrollspace-sketchybar')
 
+-- Native menu bar fallback for whenever sketchybar is off (built-in
+-- screen only -- on-display-change stops it below MIN_WIDTH). Same
+-- ScrollSpace/started-global requirement as above.
+require('scrollspace-menubar')
+
 local KITTY = '/opt/homebrew/bin/kitty'
 
 -- hs.execute always blocks the main thread until the command exits;
