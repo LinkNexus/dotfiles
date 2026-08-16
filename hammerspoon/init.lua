@@ -100,8 +100,22 @@ local KITTY = '/opt/homebrew/bin/kitty'
 -- hs.execute always blocks the main thread until the command exits;
 -- hs.task runs the shell out-of-band instead so a slow spawn can't hang
 -- every other hotkey along with it.
+--
+-- Backgrounding the actual command with `&` (not just handing it to
+-- hs.task) matters: confirmed live that hs.reload() force-kills any
+-- process still tracked by an outstanding hs.task, even an unreferenced
+-- one that plain Lua garbage collection alone left alone. `/bin/sh -c
+-- '<single command>'` also tail-call execs directly into that command
+-- with no separate child process (confirmed via ps), so for a call like
+-- `kitty --title kitty.main`, the tracked process WAS kitty.main itself
+-- -- every hs.reload() (including the automatic one on wake, see
+-- watchers.lua) was silently killing kitty.main/kitty.scratchpad out
+-- from under the user. Backgrounding makes the tracked /bin/sh exit
+-- immediately after forking the real command off into its own detached
+-- process, so by the time anything tries to terminate the tracked PID,
+-- there's nothing left to kill.
 local function runAsync(shellCommand)
-  hs.task.new('/bin/sh', nil, { '-c', shellCommand }):start()
+  hs.task.new('/bin/sh', nil, { '-c', 'nohup ' .. shellCommand .. ' >/dev/null 2>&1 &' }):start()
 end
 
 local function findWindowByTitle(title)
