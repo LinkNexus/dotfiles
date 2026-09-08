@@ -29,10 +29,16 @@ end
 local function appNamesForWorkspace(workspace)
   local apps = {}
 
-  for _, column in ipairs(ScrollSpace.state.windowList(workspace)) do
-    for _, window in ipairs(column) do
-      local app = window:application()
-      table.insert(apps, app and app:name() or '?')
+  -- windowList(workspace) is a map keyed by screen UUID, not an array --
+  -- a workspace spans every connected screen, each with its own column
+  -- strip. ipairs() over it yields nothing, which silently dropped every
+  -- tiled window from the pills and left only the floating ones.
+  for _, columns in pairs(ScrollSpace.state.windowList(workspace)) do
+    for _, column in ipairs(columns) do
+      for _, window in ipairs(column) do
+        local app = window:application()
+        table.insert(apps, app and app:name() or '?')
+      end
     end
   end
 
