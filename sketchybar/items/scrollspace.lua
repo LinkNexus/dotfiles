@@ -208,11 +208,14 @@ local function rebuild()
     -- core invoking an external script directly on click, bypassing
     -- SbarLua's event dispatch entirely, which is more likely to be the
     -- actually-supported mechanism for this event type.
+    --
+    -- sketchybar spawns this with a bare environment, so `hs` is resolved
+    -- via an explicit PATH -- the same gap watchers.lua's HOOK_PATH works
+    -- around for its own shell-outs.
     local switchCmd = string.format(
-      'echo "$(date) click_script fired for workspace %d" >> /tmp/scrollspace-click-debug.log; '
-      .. 'export PATH="/run/current-system/sw/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"; '
-      .. 'hs -c "ScrollSpace.workspace.switchWorkspace(%d)" >> /tmp/scrollspace-click-debug.log 2>&1',
-      workspace, workspace
+      'export PATH="/run/current-system/sw/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"; '
+      .. 'hs -c "ScrollSpace.workspace.switchWorkspace(%d)" >/dev/null 2>&1',
+      workspace
     )
     local bracket = sbar.add('bracket', 'workspace_bracket.' .. workspace, members, {
       background = {
