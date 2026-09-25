@@ -114,31 +114,132 @@ logTo(DISPLAY_LOG, 'watcher (re)started, initial widest = ' .. lastWidth .. 'pt'
 -- startup call, so a fresh login/reload lands in the right state.
 runHook(DISPLAY_LOG, ON_DISPLAY_CHANGE)
 
--- ── Wake safety net for both, plus hotkey-recovery reload ───────
--- macOS can silently disable Hammerspoon's global hotkey event taps
--- after sleep or a period of screen-timeout inactivity -- Hammerspoon
--- doesn't detect or recover from this on its own, so hotkeys just go
--- dead until something re-registers them. hs.reload() does that
--- (confirmed live: this is exactly the manual workaround that's been
--- fixing it). Debounced since systemDidWake and screensDidWake both
--- fire on a full-sleep wake -- one reload covers both. reload() also
--- re-runs the theme/display checks below from scratch (currentStyle()/
--- widestScreen() are recomputed at load time), so calling checkTheme/
--- scheduleDisplayCheck directly on wake would be redundant now.
+-- ── Reload-on-return safety net ────────────────────────────────
+-- macOS can silently disable Hammerspoon's global hotkeys, both after
+-- sleep and after a long idle stretch at the desk with no sleep at all
+-- (the "no console error, it just stops responding" bug,
+-- github.com/Hammerspoon/hammerspoon/issues/3294). Hammerspoon neither
+-- detects nor recovers from this on its own, so hotkeys stay dead until
+-- something re-registers them; hs.reload() does that, and is exactly the
+-- manual workaround that has been fixing it by hand.
+--
+-- The hard-won part is *when* to reload: never while the user is away.
+-- Confirmed from the Hammerspoon console log (2026-09-24): every
+-- automatic reload up to this point fired while `loginwindow` owned the
+-- session -- i.e. at the lock screen -- and every reload that actually
+-- restored working hotkeys was a manual one, unlocked. A reload at the
+-- lock screen re-runs this whole config, ScrollSpace:start() included,
+-- against an accessibility subsystem that cannot see other apps' windows
+-- while loginwindow is up: State.load()/refreshWindows() reconcile the
+-- layout against an effectively empty world, and the debounced
+-- State.save() then writes that empty result over the good snapshot.
+-- Hotkeys re-registered in that context log as "Enabled" but are not
+-- reliably live once the session comes back either. Both match the
+-- reported symptom -- ScrollSpace bindings dead after sleep or
+-- inactivity until Hammerspoon is reloaded by hand.
+--
+-- So: reload when the user *returns*, never while they are gone. Every
+-- trigger funnels through requestReload(), which fires immediately when
+-- the session is actually usable and otherwise defers to the next
+-- unlock/wake. reload() also re-runs the theme/display checks above from
+-- scratch (currentStyle()/widestScreen() are recomputed at load time),
+-- so calling checkTheme/scheduleDisplayCheck directly on wake would be
+-- redundant.
+local RELOAD_LOG = '/tmp/hs-reload.log'
+local IDLE_THRESHOLD = 600 -- 10 minutes away before a reload is worth it
+
+-- hs.caffeinate has no lock-state predicate; CGSSessionScreenIsLocked is
+-- absent from sessionProperties() entirely while unlocked and present
+-- and true at the lock screen.
+local function sessionLocked()
+  local props = hs.caffeinate.sessionProperties() or {}
+  return props.CGSSessionScreenIsLocked == true
+end
+
+-- Screen sleep has no polled equivalent either, so track it off the
+-- watcher events below.
+local screensAsleep = false
+local pendingReload = false
 local reloadDebounce = nil
-local function scheduleReload()
+
+local function sessionUsable()
+  return not screensAsleep and not sessionLocked()
+end
+
+-- Debounced: one wake fires several of the events below, and the idle
+-- poller can land in the same moment -- one reload covers them all.
+local function requestReload(reason)
+  if not sessionUsable() then
+    if not pendingReload then
+      logTo(RELOAD_LOG, 'deferring reload (' .. reason .. '): screens asleep or session locked')
+    end
+    pendingReload = true
+    return
+  end
+
   if reloadDebounce then
     reloadDebounce:stop()
   end
+  logTo(RELOAD_LOG, 'reloading: ' .. reason)
+  -- pendingReload is deliberately not cleared: hs.reload() wipes all Lua
+  -- state a second later, which clears it far more thoroughly.
   reloadDebounce = hs.timer.doAfter(1, function() hs.reload() end)
 end
 
-local wakeWatcher = hs.caffeinate.watcher.new(function(event)
-  if event == hs.caffeinate.watcher.systemDidWake or event == hs.caffeinate.watcher.screensDidWake then
-    scheduleReload()
+local caffeinate = hs.caffeinate.watcher
+
+-- Anything that means "the user may be back". screensDidWake usually
+-- still lands at the lock screen and simply defers; the screensDidUnlock
+-- or sessionDidBecomeActive that follows is what actually reloads. On a
+-- machine that never locks, screensDidWake reloads directly.
+local RETURN_EVENTS = {
+  [caffeinate.systemDidWake] = 'systemDidWake',
+  [caffeinate.screensDidWake] = 'screensDidWake',
+  [caffeinate.screensDidUnlock] = 'screensDidUnlock',
+  [caffeinate.sessionDidBecomeActive] = 'sessionDidBecomeActive',
+  [caffeinate.screensaverDidStop] = 'screensaverDidStop',
+}
+
+local wakeWatcher = caffeinate.new(function(event)
+  -- keep the sleep flag current before anything consults sessionUsable()
+  if event == caffeinate.screensDidSleep then
+    screensAsleep = true
+  elseif event == caffeinate.screensDidWake then
+    screensAsleep = false
+  end
+
+  local reason = RETURN_EVENTS[event]
+  if reason then
+    requestReload(reason)
   end
 end)
 wakeWatcher:start()
+
+-- The no-sleep, no-lock case: the machine just sits idle at the desk and
+-- the tap dies with no caffeinate event ever firing. idleTime() dropping
+-- between two samples means real input happened, i.e. the user is back --
+-- reload on that transition only, and only if they had been gone long
+-- enough for the tap to plausibly have died.
+--
+-- This replaces an earlier "reload while idle, throttled by a cooldown
+-- persisted to /tmp" approach. That one could not distinguish "still
+-- away" from "back", so it just re-fired every 25 minutes for as long as
+-- the machine stayed idle -- 14 reloads over one night, every one of
+-- them at the lock screen, every one a chance to overwrite ScrollSpace's
+-- persisted layout with an empty one. Reacting to the return transition
+-- needs no cooldown and no persisted state: the reload it triggers wipes
+-- lastIdle along with everything else, and the next sample starts from a
+-- fresh, small idle time.
+local lastIdle = hs.host.idleTime()
+
+local idlePoller = hs.timer.doEvery(30, function()
+  local idle = hs.host.idleTime()
+  if lastIdle > IDLE_THRESHOLD and idle < lastIdle then
+    requestReload(string.format('back after %ds idle', math.floor(lastIdle)))
+  end
+  lastIdle = idle
+end)
+
 
 -- Returned (and required from init.lua into a local) purely so these
 -- watcher objects stay referenced and don't get garbage collected --
@@ -150,4 +251,5 @@ return {
   screenWatcher = screenWatcher,
   displayPoller = displayPoller,
   wakeWatcher = wakeWatcher,
+  idlePoller = idlePoller,
 }
