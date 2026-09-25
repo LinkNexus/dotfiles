@@ -17,18 +17,39 @@ DIM="$CACHE_DIR/${SAFE_NAME}_dim.png"
 # Renders a 35%-opacity copy of $OUT next to it -- used for app icons
 # in unfocused workspaces. sips can't touch alpha, so draw it with
 # AppKit via JXA (in-process, no permission prompts).
+#
+# The size arithmetic is the fiddly part. NSImage.size is in POINTS,
+# derived from the file's DPI metadata, while lockFocus allocates its
+# backing store at the main display's backingScaleFactor. Sizing the
+# destination in raw points therefore made the output pixel size depend
+# on both -- and PWA .icns files (Chrome/Safari-generated web apps) come
+# out of sips at 72 dpi where every normal app's icon is 144, so their
+# 40px source became a 20pt image, became an 80px dim on a 2x display:
+# double size, spilling outside its pill. Sizing the destination at
+# pixels/backingScale instead pins the output to exactly the source's
+# pixel dimensions no matter what either value happens to be.
 make_dim() {
   osascript -l JavaScript -e '
     ObjC.import("AppKit");
     const src = $.NSImage.alloc.initWithContentsOfFile("'"$OUT"'");
-    const size = src.size;
-    const out = $.NSImage.alloc.initWithSize(size);
+
+    // largest representation, in pixels -- not src.size, see above
+    let w = 0, h = 0;
+    const reps = src.representations;
+    for (let i = 0; i < reps.count; i++) {
+      const r = reps.objectAtIndex(i);
+      if (r.pixelsWide > w) { w = r.pixelsWide; h = r.pixelsHigh; }
+    }
+
+    const scale = $.NSScreen.mainScreen.backingScaleFactor;
+    const out = $.NSImage.alloc.initWithSize($.NSMakeSize(w / scale, h / scale));
     out.lockFocus;
     src.drawInRectFromRectOperationFraction(
-      $.NSMakeRect(0, 0, size.width, size.height),
+      $.NSMakeRect(0, 0, w / scale, h / scale),
       $.NSMakeRect(0, 0, 0, 0),
       $.NSCompositingOperationSourceOver, 0.35);
     out.unlockFocus;
+
     const rep = $.NSBitmapImageRep.imageRepWithData(out.TIFFRepresentation);
     const png = rep.representationUsingTypeProperties(
       $.NSBitmapImageFileTypePNG, $.NSDictionary.dictionary);
