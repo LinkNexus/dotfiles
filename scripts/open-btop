@@ -8,6 +8,21 @@ if ! pgrep -f 'kitty --title kitty.btop' >/dev/null; then
     # Absolute path, not bare `kitty` -- this runs via hs.task.new from
     # Hammerspoon, which doesn't inherit an interactive shell's PATH
     # (Hammerspoon.app never sources .zshrc), so PATH resolution fails
-    # silently here even though it works fine from a normal terminal.
-    exec /opt/homebrew/bin/kitty --title kitty.btop -e btop
+    # silently even though it works fine from a normal terminal.
+    #
+    # nohup + `&`, not a foreground `exec`: this script is called both
+    # from scripts/on-theme-change (itself run via Hammerspoon's
+    # hs.task) and from open-login-apps. A foreground `exec` here means
+    # the caller never returns for as long as btop stays open -- it's
+    # sitting in `wait()` on this process the whole time. Apple's NSTask
+    # docs say `-terminate` "sends a terminate signal to the receiver
+    # and all of its subtasks" -- so any hs.reload() (e.g. the
+    # sleep/wake hotkey-recovery one in watchers.lua) that fires while
+    # on-theme-change's hs.task is still blocked here kills kitty.btop
+    # right along with it, same root cause the kitty.main/scratchpad
+    # fix (see init.lua's runAsync) already addressed for the hotkey-
+    # spawned windows. Backgrounding here means the caller returns
+    # immediately, so there's nothing left tracked to kill by the time
+    # any of that happens.
+    nohup /opt/homebrew/bin/kitty --title kitty.btop -e btop >/dev/null 2>&1 &
 fi
