@@ -201,6 +201,19 @@ local function rebuild()
       table.insert(members, appItem.name)
     end
 
+    -- click_script, not bracket:subscribe('mouse.clicked', ...): confirmed
+    -- live that the Lua-callback subscribe path never fires for mouse
+    -- events (a debug log write placed first in that callback never
+    -- happened on an actual click) -- click_script is sketchybar's C
+    -- core invoking an external script directly on click, bypassing
+    -- SbarLua's event dispatch entirely, which is more likely to be the
+    -- actually-supported mechanism for this event type.
+    local switchCmd = string.format(
+      'echo "$(date) click_script fired for workspace %d" >> /tmp/scrollspace-click-debug.log; '
+      .. 'export PATH="/run/current-system/sw/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"; '
+      .. 'hs -c "ScrollSpace.workspace.switchWorkspace(%d)" >> /tmp/scrollspace-click-debug.log 2>&1',
+      workspace, workspace
+    )
     local bracket = sbar.add('bracket', 'workspace_bracket.' .. workspace, members, {
       background = {
         drawing = true,
@@ -210,10 +223,8 @@ local function rebuild()
         corner_radius = 12,
         height = 24,
       },
+      click_script = switchCmd,
     })
-    bracket:subscribe('mouse.clicked', function()
-      sbar.exec("hs -c 'ScrollSpace.workspace.switchWorkspace(" .. workspace .. ")'")
-    end)
 
     newPrevious[workspace] = #ws.apps
   end

@@ -33,10 +33,12 @@ local watchers = require('watchers')
 -- muscle memory keeps carrying over, including slurp_in/barf_out
 -- (cmd+alt+,/cmd+alt+shift+,) for stacking a window into the column to its
 -- left / popping it back out into its own column -- the way to tile
--- vertically. decrease_width/increase_width/focus_floating had no
--- ScrollSpace equivalent to bind -- see the spoon's CLAUDE.md "explicitly
--- out of scope for v1" section -- so those chords are simply unbound for
--- now rather than guessing at a replacement. New to this trial:
+-- vertically, and focus_floating (cmd+alt+shift+f) for pulling the
+-- floating layer back out from behind the tiled strip. decrease_width/
+-- increase_width had no ScrollSpace equivalent to bind -- see the spoon's
+-- CLAUDE.md "explicitly out of scope for v1" section -- so those chords
+-- are simply unbound for now rather than guessing at a replacement.
+-- New to this trial:
 -- switch_workspace_1..9/move_window_1..9 (virtual workspaces) and
 -- toggle_scratchpad/set_scratchpad (a single scratchpad window, unrelated
 -- to the kitty/Finder hide-app scratchpads below -- those are a
