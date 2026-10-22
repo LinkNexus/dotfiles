@@ -1,4 +1,6 @@
+tap "cristianoliveira/tap"
 tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
+tap "nikitabobko/tap"
 # Deep clean and optimize your Mac
 brew "mole"
 # Paste PNG into files
@@ -25,8 +27,6 @@ cask "kitty"
 cask "localsend"
 # GameStream client
 cask "moonlight"
-# Open-source software for live streaming and screen recording
-cask "obs"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
 # Virtual machine client
@@ -43,10 +43,6 @@ cask "tailscale-app"
 cask "thunderbird"
 # Open-source code editor
 cask "visual-studio-code@insiders"
-# Multimedia player
-cask "vlc"
-# Multiplayer code editor
-cask "zed"
 # Gecko based web browser
 cask "zen"
 vscode "anthropic.claude-code"

@@ -69,10 +69,15 @@ ScrollSpace.window_filter = ScrollSpace.window_filter
 -- above, so it's untouched by these rules and stays on its separate
 -- app-hide/unhide toggle (cmd+alt+i).
 ScrollSpace.rules = {
-  { app = 'kitty',       title = '^kitty%.main$', workspace = 1 },
-  { app = 'Zen',         workspace = 1 },
-  { app = 'kitty',       title = '^kitty%.btop$', workspace = 2 },
-  { app = 'Thunderbird', workspace = 2 },
+  { app = 'kitty',        title = '^kitty%.main$', workspace = 1 },
+  { app = 'Zen',          workspace = 1 },
+  { app = 'Gmail',        workspace = 3 },
+  { app = 'WhatsApp Web', workspace = 3 },
+  { app = 'YT Music',     workspace = 4 },
+  { app = 'YouTube',      workspace = 4 },
+  { app = 'Moonlight',    workspace = 5 },
+  { app = 'Wallper',      workspace = 5 },
+  { app = 'kitty',        title = '^kitty%.btop$', workspace = 5 },
 }
 
 -- Copy of ScrollSpace.default_hotkeys with center_window dropped (its
