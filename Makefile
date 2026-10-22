@@ -43,34 +43,22 @@ install-common:
 	mkdir -p $(CONFIG)
 	ln -sfn $(ROOT)/nvim $(CONFIG)/nvim
 	ln -sfn $(ROOT)/vscode/settings.json $(VSCODE_CONFIG)/settings.json
+	mkdir -p $(HOME)/.claude
+	ln -sfn $(ROOT)/claude/themes $(HOME)/.claude/themes
 
 install-macos: setup-zsh
 	ln -sfn $(ROOT)/ghostty $(CONFIG)/ghostty
 	ln -sfn $(ROOT)/kitty $(CONFIG)/kitty
 	ln -sfn $(ROOT)/tmux $(CONFIG)/tmux
 	ln -sfn $(ROOT)/zsh/.zshenv $(HOME)/.zshenv
-	ln -sfn $(ROOT)/paneru $(CONFIG)/paneru
 	ln -sfn $(ROOT)/sketchybar $(CONFIG)/sketchybar
 
 	# sketchybarrc is a Lua script (SbarLua) -- builds the sketchybar.so
 	# module it requires into ~/.local/share/sketchybar_lua if missing
 	$(ROOT)/scripts/install-sbarlua
 
-	# Paneru manages its own launchd registration (unlike the watchers
-	# below, there's no plist in this repo to copy). `install` is a
-	# no-op if already installed; `start` is safe to re-run too. Still
-	# requires granting Accessibility permission once by hand on first run.
-	paneru install
-	paneru start
 	ln -sfn $(ROOT)/hammerspoon $(HOME)/.hammerspoon
 	ln -sfn $(ROOT)/btop $(CONFIG)/btop
-
-	# Custom Claude Code themes (carbonfox/dayfox, switched by
-	# scripts/on-theme-change following the OS appearance). macOS-only
-	# for now: the auto-switch mechanism is tied to AppleInterfaceStyle
-	# and launchd. Revisit once Linux/Windows get their own watchers.
-	mkdir -p $(HOME)/.claude
-	ln -sfn $(ROOT)/claude/themes $(HOME)/.claude/themes
 
 	# Theme-change watcher runs as a LaunchAgent so it works even with
 	# sketchybar disabled. Copied, not symlinked: launchd is unreliable
