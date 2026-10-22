@@ -48,7 +48,6 @@ install-macos: setup-zsh
 	ln -sfn $(ROOT)/ghostty $(CONFIG)/ghostty
 	ln -sfn $(ROOT)/kitty $(CONFIG)/kitty
 	ln -sfn $(ROOT)/tmux $(CONFIG)/tmux
-	ln -sfn $(ROOT)/wezterm/.wezterm.lua $(HOME)/.wezterm.lua
 	ln -sfn $(ROOT)/zsh/.zshenv $(HOME)/.zshenv
 	ln -sfn $(ROOT)/paneru $(CONFIG)/paneru
 	ln -sfn $(ROOT)/sketchybar $(CONFIG)/sketchybar
@@ -100,7 +99,6 @@ install-linux: setup-zsh
 	ln -sfn $(ROOT)/zsh/.zshenv $(HOME)/.zshenv
 
 install-windows:
-	ln -sfn $(ROOT)/wezterm/.wezterm.lua $(HOME)/.wezterm.lua
 
 uninstall:
 	-paneru stop
