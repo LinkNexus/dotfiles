@@ -1,0 +1,11 @@
+#!/bin/bash
+# Runs the Command Line Tools' real lldb instead of /usr/bin/lldb.
+# /usr/bin/lldb is only an xcrun shim that looks lldb up under
+# $DEVELOPER_DIR, and inside a nix dev shell that points at nix's
+# apple-sdk, which has no lldb ("error: tool 'lldb' not found").
+# DEVELOPER_DIR itself is left alone: nix's clang and xcrun need it,
+# and the debuggee should see the same environment as outside lldb.
+# Finds debugserver through LLDB_DEBUGSERVER_PATH (set in .zshenv).
+# Comes before /usr/bin via the dotfiles/scripts entry in PATH; a dev
+# shell that adds its own lldb (pkgs.lldb) still wins, which is fine.
+exec /Library/Developer/CommandLineTools/usr/bin/lldb "$@"
