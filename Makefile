@@ -1,9 +1,3 @@
-# Windows has no built-in `make`: install one via `choco install make`,
-# `scoop install make`, or MSYS2's `pacman -S make`, then run this from
-# Git Bash (its bundled sh.exe/coreutils are what make the POSIX-shell
-# recipes below -- ln -sfn, mkdir -p, rm -f -- work). Creating symlinks
-# also needs either an elevated shell or Developer Mode turned on.
-
 ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 CONFIG := $(HOME)/.config
 
@@ -45,6 +39,7 @@ install-common:
 	ln -sfn $(ROOT)/vscode/settings.json $(VSCODE_CONFIG)/settings.json
 	mkdir -p $(HOME)/.claude
 	ln -sfn $(ROOT)/claude/themes $(HOME)/.claude/themes
+	ln -sfn $(ROOT)/claude/settings.json $(HOME)/.claude/settings.json
 
 install-macos: setup-zsh
 	ln -sfn $(ROOT)/ghostty $(CONFIG)/ghostty
@@ -69,8 +64,7 @@ install-macos: setup-zsh
 	launchctl bootstrap gui/$$(id -u) $(HOME)/Library/LaunchAgents/com.levynkeneng.theme-watcher.plist
 
 	# Display watcher: enables/disables sketchybar and JankyBorders based
-	# on whether a screen wide enough for them is connected (Paneru itself
-	# runs continuously as its own launchd service, see paneru/paneru.toml)
+	# on whether a screen wide enough for them is connected 
 	cp $(ROOT)/launchd/com.levynkeneng.display-watcher.plist $(HOME)/Library/LaunchAgents/
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.display-watcher 2>/dev/null
 	launchctl bootstrap gui/$$(id -u) $(HOME)/Library/LaunchAgents/com.levynkeneng.display-watcher.plist
@@ -89,8 +83,6 @@ install-linux: setup-zsh
 install-windows:
 
 uninstall:
-	-paneru stop
-	-paneru uninstall
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.theme-watcher 2>/dev/null
 	rm -f $(HOME)/Library/LaunchAgents/com.levynkeneng.theme-watcher.plist
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.display-watcher 2>/dev/null
@@ -98,11 +90,11 @@ uninstall:
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.login-apps 2>/dev/null
 	rm -f $(HOME)/Library/LaunchAgents/com.levynkeneng.login-apps.plist
 	rm -f $(HOME)/.claude/themes
+	rm -f $(HOME)/.claude/settings.json
 	rm -f $(CONFIG)/nvim
 	rm -f $(CONFIG)/ghostty
 	rm -f $(CONFIG)/kitty
 	rm -f $(CONFIG)/tmux
-	rm -f $(CONFIG)/paneru
 	rm -f $(CONFIG)/sketchybar
 	rm -f $(HOME)/.hammerspoon
 	rm -f $(CONFIG)/btop

@@ -1,0 +1,10 @@
+{
+  "model": "opus",
+  "tui": "fullscreen",
+  "theme": "custom:dayfox",
+  "agentPushNotifEnabled": true,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
+}

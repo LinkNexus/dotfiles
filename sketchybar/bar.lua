@@ -6,8 +6,8 @@
 -- 30 = native menu bar height on this display (NSScreen frame minus
 -- visibleFrame) -- must match or items sit higher than menu bar content
 --
--- display = 'main' draws the bar on the macOS primary display only,
--- instead of sketchybar's default of every connected display. The
+-- The bar is drawn only on displays at least MIN_DISPLAY_WIDTH points
+-- wide, instead of sketchybar's default of every connected display. The
 -- built-in copy of this bar is unusable on a dual ultrawide + built-in
 -- setup, in two ways a single bar cannot express per-display:
 --   - `height` above is one global value, measured at 30pt to match the
@@ -18,20 +18,16 @@
 --     items/scrollspace.lua), and centre on a notched display is exactly
 --     where the notch is -- the pills render behind it.
 --
--- IMPORTANT: "main" here is the macOS *primary* display -- the one whose
--- fullFrame origin is (0,0), set by dragging the white menu bar in
--- System Settings > Displays > Arrangement. This setting is therefore
--- only correct while the LG ULTRAWIDE is the primary display. It was
--- NOT, originally: the built-in sat at (0,0) with the ultrawide at
--- -2924, so this line pinned the pills to the built-in -- the exact
--- display they're unusable on. Making the ultrawide primary is what
--- makes this right, and it also makes the 30pt height above correct by
--- construction rather than by coincidence.
---
--- Chosen over an explicit `display=<index>` deliberately: indices shift
--- when displays are replugged, and an index pinned to the ultrawide
--- would draw nothing at all when undocked to the built-in alone.
--- Following the menu bar degrades gracefully instead.
+-- Filtering by width replaced `display = 'main'`, which was only right
+-- while the ultrawide happened to be the macOS primary display -- and
+-- it wasn't always (the built-in at (0,0) pinned the pills to exactly
+-- the display they're unusable on). A hardcoded `display=<index>` was
+-- no better: arrangement ids shift when displays are replugged. Width
+-- is a property of the display itself, so it survives both. It is
+-- recomputed on every display_change, and falls back to 'main' when no
+-- display qualifies (undocked, built-in only) so the bar never vanishes.
+local MIN_DISPLAY_WIDTH = 2000 -- points; built-in is 1470, ultrawide 3008
+
 sbar.bar({
   height = 30,
   display = 'main',
@@ -43,3 +39,20 @@ sbar.bar({
   blur_radius = 0,
   y_offset = 0,
 })
+
+local function updateBarDisplays()
+  sbar.exec('sketchybar --query displays', function(displays)
+    local ids = {}
+    for _, d in ipairs(displays) do
+      if d.frame.w >= MIN_DISPLAY_WIDTH then
+        table.insert(ids, d['arrangement-id'])
+      end
+    end
+    sbar.bar({ display = #ids > 0 and table.concat(ids, ',') or 'main' })
+  end)
+end
+
+-- Invisible item: SbarLua subscriptions must hang off an item
+local watcher = sbar.add('item', 'bar_display_watcher', { drawing = false })
+watcher:subscribe('display_change', updateBarDisplays)
+updateBarDisplays()
