@@ -26,7 +26,13 @@
 -- is a property of the display itself, so it survives both. It is
 -- recomputed on every display_change, and falls back to 'main' when no
 -- display qualifies (undocked, built-in only) so the bar never vanishes.
-local MIN_DISPLAY_WIDTH = 2000 -- points; built-in is 1470, ultrawide 3008
+--
+-- Same cutoff as scripts/on-display-change's MIN_WIDTH, which decides
+-- whether sketchybar runs at all: any display wide enough to start the
+-- bar is wide enough to carry it. 2000 originally, tuned to the
+-- ultrawide alone, put the bar back on the built-in as soon as a 1920pt
+-- 4K external was the only other display.
+local MIN_DISPLAY_WIDTH = 1800 -- points; built-in is 1470, 4K 1920, ultrawide 3008
 
 sbar.bar({
   height = 30,

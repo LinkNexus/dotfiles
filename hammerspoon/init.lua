@@ -43,9 +43,10 @@ local watchers = require('watchers')
 -- toggle_scratchpad/set_scratchpad (a single scratchpad window, unrelated
 -- to the kitty/Finder hide-app scratchpads below -- those are a
 -- separate mechanism). btop used to have its own hide-app toggle here
--- too (cmd+alt+t) but that's gone now that it's a normal ScrollSpace-
--- tracked window on workspace 2 -- cmd+alt+2 is how you get to it,
--- rather than two mechanisms fighting over the same window's visibility.
+-- too, but that's gone now that it's a normal ScrollSpace-tracked window
+-- on workspace 5 -- rather than two mechanisms fighting over the same
+-- window's visibility, cmd+alt+t (focusOrSpawnBtop below) just focuses
+-- it and ScrollSpace follows focus there.
 ScrollSpace = hs.loadSpoon('ScrollSpace')
 
 ScrollSpace.window_gap = 12 -- matches paneru.toml's 4+4 per-window padding sum
@@ -197,7 +198,24 @@ local function focusOrSpawnMainTerminal()
   end
 end
 
+-- kitty.btop lives on workspace 5 (see ScrollSpace.rules above), so
+-- focusing it switches there -- ScrollSpace follows a focused window to
+-- its own workspace. Spawns through scripts/open-btop, the same path
+-- open-login-apps and on-theme-change use, so there's one place that
+-- knows how btop's kitty is launched.
+local OPEN_BTOP = os.getenv('HOME') .. '/dotfiles/scripts/open-btop'
+
+local function focusOrSpawnBtop()
+  local win = findWindowByTitle('kitty.btop')
+  if win then
+    win:focus()
+  else
+    runAsync(OPEN_BTOP)
+  end
+end
+
 hs.hotkey.bind({ 'cmd', 'alt' }, 'i', toggleKittyScratchpad)
 hs.hotkey.bind({ 'cmd', 'alt' }, 'e', toggleFinderScratchpad)
 hs.hotkey.bind({ 'cmd', 'alt' }, 'b', function() runAsync('open -a Zen') end)
 hs.hotkey.bind({ 'cmd', 'alt' }, 'c', focusOrSpawnMainTerminal)
+hs.hotkey.bind({ 'cmd', 'alt' }, 't', focusOrSpawnBtop)
