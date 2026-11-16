@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Workspace.cursorShader</key>
+	<string>warp</string>
+	<key>Workspace.cursorShadersEnabled</key>
+	<true/>
+	<key>Workspace.darkThemeID</key>
+	<string>custom-D5E8E61A-10F2-4E74-A8E7-2B0DBC8EFB87</string>
+	<key>Workspace.inactivePaneFadeMode</key>
+	<string>both</string>
+	<key>Workspace.interfaceStyle</key>
+	<string>blendTheme</string>
+	<key>Workspace.lightThemeID</key>
+	<string>custom-C1BE5CA4-FBF6-49BC-8EFF-C86EECEB4E35</string>
+	<key>Workspace.tabIconTintMode</key>
+	<string>off</string>
+	<key>Workspace.terminalCursorBlinkIntervalMilliseconds</key>
+	<integer>500</integer>
+	<key>Workspace.terminalCursorBlinkUsesCustomInterval</key>
+	<false/>
+	<key>Workspace.terminalCursorStyle</key>
+	<string>block</string>
+	<key>Workspace.terminalFontName</key>
+	<string>MonaspiceRn Nerd Font Mono</string>
+	<key>Workspace.terminalFontPointSize</key>
+	<real>19.0</real>
+	<key>Workspace.terminalFontSmoothing</key>
+	<true/>
+	<key>Workspace.terminalSmoothScrolling</key>
+	<true/>
+	<key>Workspace.usesPaneGlass</key>
+	<true/>
+	<key>Workspace.usesStandardInactiveWindowPaneStyles</key>
+	<true/>
+</dict>
+</plist>

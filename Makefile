@@ -19,7 +19,7 @@ else
 	VSCODE_CONFIG := $(HOME)/.config/Code/User
 endif
 
-.PHONY: install install-common install-macos install-linux install-windows uninstall
+.PHONY: install install-common install-macos install-linux install-windows uninstall rex-export
 
 install: install-common install-$(OS)
 
@@ -55,6 +55,13 @@ install-macos: setup-zsh
 	ln -sfn $(ROOT)/hammerspoon $(HOME)/.hammerspoon
 	ln -sfn $(ROOT)/btop $(CONFIG)/btop
 
+	# Rex: keys come from init.lua; everything set in its Settings window
+	# lives in its defaults domain, restored from rex/ (skipped, not
+	# fatal, while Rex is running). Save changes with `make rex-export`.
+	mkdir -p $(CONFIG)/rex
+	ln -sfn $(ROOT)/rex/init.lua $(CONFIG)/rex/init.lua
+	-$(ROOT)/scripts/rex-prefs apply
+
 	# Theme-change watcher runs as a LaunchAgent so it works even with
 	# sketchybar disabled. Copied, not symlinked: launchd is unreliable
 	# with symlinked plists. Re-run install after plist edits.
@@ -73,6 +80,9 @@ install-macos: setup-zsh
 	cp $(ROOT)/launchd/com.levynkeneng.login-apps.plist $(HOME)/Library/LaunchAgents/
 	-launchctl bootout gui/$$(id -u)/com.levynkeneng.login-apps 2>/dev/null
 	launchctl bootstrap gui/$$(id -u) $(HOME)/Library/LaunchAgents/com.levynkeneng.login-apps.plist
+
+rex-export:
+	$(ROOT)/scripts/rex-prefs export
 
 install-linux: setup-zsh
 	ln -sfn $(ROOT)/ghostty $(CONFIG)/ghostty
@@ -98,6 +108,7 @@ uninstall:
 	rm -f $(CONFIG)/sketchybar
 	rm -f $(HOME)/.hammerspoon
 	rm -f $(CONFIG)/btop
+	rm -f $(CONFIG)/rex/init.lua
 	rm -f $(HOME)/.wezterm.lua
 	rm -f $(HOME)/.zshenv
 	rm -f "$(HOME)/Library/Application Support/Code - Insiders/User/settings.json"
