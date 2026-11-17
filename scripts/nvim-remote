@@ -1,0 +1,40 @@
+#!/bin/bash
+# Opens files in the nvim that launched this yazi, then quits yazi.
+# nvim's <leader>ef (nvim/lua/utils/rex_yazi.lua) starts yazi in a
+# floating Rex pane with NVIM_SERVER set; yazi's edit opener and its
+# <C-v>/<C-x>/<C-t> keys (yazi/) call this. Without NVIM_SERVER, i.e.
+# a standalone yazi, it just runs $EDITOR so the same keys still work.
+#
+#   nvim-remote edit|vsplit|split|tabedit FILE...
+
+cmd=$1
+shift
+
+if [ -z "$NVIM_SERVER" ]; then
+  case $cmd in
+    vsplit) exec "${EDITOR:-vi}" -O "$@" ;;
+    split) exec "${EDITOR:-vi}" -o "$@" ;;
+    tabedit) exec "${EDITOR:-vi}" -p "$@" ;;
+    *) exec "${EDITOR:-vi}" "$@" ;;
+  esac
+fi
+
+# Build a Vim list of single-quoted strings; '' escapes a quote inside one.
+# The quote goes through $q because macOS's bash 3.2 keeps the
+# backslashes of \' in a ${//} replacement.
+q="'"
+files=
+for f in "$@"; do
+  files+="$q${f//$q/$q$q}$q,"
+done
+
+# Keep the terminal off stdin and stderr: with a tty on either, nvim
+# stalls about a second before even contacting the server
+if ! err=$(nvim --server "$NVIM_SERVER" \
+  --remote-expr "v:lua.require'utils.rex_yazi'.open_files('$cmd', [$files])" 2>&1 >/dev/null </dev/null); then
+  echo "$err" >&2
+  read -rp "Press enter to return to yazi"
+  exit 1
+fi
+
+ya emit quit

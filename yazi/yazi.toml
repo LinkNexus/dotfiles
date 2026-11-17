@@ -1,0 +1,6 @@
+# Text files open through scripts/nvim-remote: in the nvim that launched
+# this yazi when there is one (NVIM_SERVER), else in $EDITOR as usual.
+[opener]
+edit = [
+  { run = "nvim-remote edit %s", desc = "$EDITOR", for = "unix", block = true },
+]

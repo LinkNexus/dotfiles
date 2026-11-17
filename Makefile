@@ -43,6 +43,7 @@ install-common:
 
 install-macos: setup-zsh
 	ln -sfn $(ROOT)/ghostty $(CONFIG)/ghostty
+	ln -sfn $(ROOT)/yazi $(CONFIG)/yazi
 	ln -sfn $(ROOT)/kitty $(CONFIG)/kitty
 	ln -sfn $(ROOT)/tmux $(CONFIG)/tmux
 	ln -sfn $(ROOT)/zsh/.zshenv $(HOME)/.zshenv
@@ -86,6 +87,7 @@ rex-export:
 
 install-linux: setup-zsh
 	ln -sfn $(ROOT)/ghostty $(CONFIG)/ghostty
+	ln -sfn $(ROOT)/yazi $(CONFIG)/yazi
 	ln -sfn $(ROOT)/kitty $(CONFIG)/kitty
 	ln -sfn $(ROOT)/tmux $(CONFIG)/tmux
 	ln -sfn $(ROOT)/zsh/.zshenv $(HOME)/.zshenv
@@ -103,6 +105,7 @@ uninstall:
 	rm -f $(HOME)/.claude/settings.json
 	rm -f $(CONFIG)/nvim
 	rm -f $(CONFIG)/ghostty
+	rm -f $(CONFIG)/yazi
 	rm -f $(CONFIG)/kitty
 	rm -f $(CONFIG)/tmux
 	rm -f $(CONFIG)/sketchybar

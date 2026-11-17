@@ -1,70 +1,65 @@
--- Rex keymap: plain cmd and cmd+shift chords, no prefix and no modes, so
--- every ctrl and alt key reaches the shell and nvim untouched.
+-- Rex keymap: tabs keep the usual macOS cmd chords; everything else hangs
+-- off one leader (ctrl+option for now, set below), with shift for the
+-- "stronger" version of a key. No prefix and no modes, so ctrl and alt
+-- on their own still reach the shell and nvim.
 --
 -- cmd+alt and cmd+alt+shift belong to ScrollSpace/Hammerspoon, which grab
--- them system-wide before Rex sees them, so Rex binds nothing there and
--- drops whatever defaults it had on them (bottom of this file).
+-- them system-wide before Rex sees them, so Rex binds nothing there. Its
+-- own defaults on those chords never fire; unbinding them is pointless and
+-- warns for every chord Rex had no default on.
 -- macOS's own chords (cmd+h/m/q, cmd+shift+3/4/5, ...) are left alone.
+
+local leader = "ctrl+alt+"
 
 ------------------------------------------------------------------------
 -- Tabs
 ------------------------------------------------------------------------
 rex.bind("cmd+t", "client.tab.new")
-rex.bind("cmd+shift+w", "client.tab.close")
-rex.bind("cmd+shift+r", "client.tab.rename")
-rex.bind("cmd+shift+[", "client.tab.previous")
-rex.bind("cmd+shift+]", "client.tab.next")
-rex.bind("cmd+shift+,", "client.tab.move.backward")
-rex.bind("cmd+shift+.", "client.tab.move.forward")
 for i = 1, 9 do
   rex.bind("cmd+" .. i, "client.tab.goto", { index = i })
+  rex.bind(leader .. i, "client.tab.goto", { index = i })
 end
+rex.bind(leader .. "t", "client.tab.new")
+rex.bind(leader .. "shift+w", "client.tab.close")
+rex.bind(leader .. "r", "client.tab.rename")
+rex.bind(leader .. ",", "client.tab.previous")
+rex.bind(leader .. ".", "client.tab.next")
+rex.bind(leader .. "shift+,", "client.tab.move.backward")
+rex.bind(leader .. "shift+.", "client.tab.move.forward")
 
 ------------------------------------------------------------------------
 -- Panes
 ------------------------------------------------------------------------
 -- cmd+w closes the focused pane, else the tab, else the window
 rex.bind("cmd+w", "client.close")
-rex.bind("cmd+enter", "pane.split.auto")
-rex.bind("cmd+d", "pane.split.right")
-rex.bind("cmd+shift+d", "pane.split.down")
-rex.bind("cmd+shift+enter", "pane.zoom")
-rex.bind("cmd+shift+b", "pane.move_to_new_tab")
-rex.bind("ctrl+cmd+=", "pane.balance")
+rex.bind(leader .. "w", "client.close")
+rex.bind(leader .. "enter", "pane.split.auto")
+rex.bind(leader .. "d", "pane.split.right")
+rex.bind(leader .. "shift+d", "pane.split.down")
+rex.bind(leader .. "z", "pane.zoom")
+rex.bind(leader .. "b", "pane.move_to_new_tab")
+rex.bind(leader .. "=", "pane.balance")
 
--- Floating panes. cmd+shift+n stays Rex's New Session.
-rex.bind("cmd+shift+f", "pane.float")
-rex.bind("cmd+shift+o", "pane.new_floating")
-rex.bind("cmd+shift+m", "pane.minimize_floating")
+-- Floating panes
+rex.bind(leader .. "f", "pane.float")
+rex.bind(leader .. "o", "pane.new_floating")
+rex.bind(leader .. "m", "pane.minimize_floating")
+rex.bind(leader .. "shift+m", "pane.minimize_all_floating")
 
--- Focus: hjkl, plus cmd+[ / cmd+] to cycle
-rex.bind("cmd+shift+h", "pane.focus", { direction = "left" })
-rex.bind("cmd+shift+j", "pane.focus", { direction = "down" })
-rex.bind("cmd+shift+k", "pane.focus", { direction = "up" })
-rex.bind("cmd+shift+l", "pane.focus", { direction = "right" })
-rex.bind("cmd+[", "pane.focus_previous")
-rex.bind("cmd+]", "pane.focus_next")
-
--- Resize with ctrl+cmd, move with ctrl+cmd+shift, both on hjkl
-for key, direction in pairs({ h = "left", j = "down", k = "up", l = "right" }) do
-  rex.bind("ctrl+cmd+" .. key, "pane.resize", { direction = direction, amount = 5 })
-  rex.bind("ctrl+cmd+shift+" .. key, "pane.move", { direction = direction })
+-- Arrows: focus, shift moves the pane, cmd resizes it; [ ] cycle panes
+for _, direction in ipairs({ "left", "down", "up", "right" }) do
+  rex.bind(leader .. direction, "pane.focus", { direction = direction })
+  rex.bind(leader .. "shift+" .. direction, "pane.move", { direction = direction })
+  rex.bind(leader .. "cmd+" .. direction, "pane.resize", { direction = direction, amount = 5 })
 end
+rex.bind(leader .. "[", "pane.focus_previous")
+rex.bind(leader .. "]", "pane.focus_next")
 
 ------------------------------------------------------------------------
 -- Misc
 ------------------------------------------------------------------------
-rex.bind("ctrl+cmd+,", "client.config.reload")
-
-------------------------------------------------------------------------
--- Keep off ScrollSpace's and Hammerspoon's chords (hammerspoon/init.lua)
-------------------------------------------------------------------------
-local taken = {
-  "left", "right", "up", "down", "escape", ",", "`",
-  "1", "2", "3", "4", "5", "6", "7", "8", "9",
-  "b", "c", "d", "e", "f", "i", "o", "q", "r", "s", "t",
-}
-for _, key in ipairs(taken) do
-  rex.unbind("cmd+alt+" .. key)
-  rex.unbind("cmd+alt+shift+" .. key)
-end
+-- The session picker moves off cmd+k, which clears the terminal as in
+-- Terminal.app, iTerm2 and Ghostty
+rex.bind(leader .. "k", "session.switch")
+rex.bind("cmd+k", "com.superlogical.terminal.clear")
+rex.bind(leader .. "shift+r", "client.config.reload")

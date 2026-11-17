@@ -1,0 +1,7 @@
+# Open in nvim splits/tabs, the way yazi.nvim did; see scripts/nvim-remote
+[mgr]
+prepend_keymap = [
+  { on = "<C-v>", run = "shell --block -- nvim-remote vsplit %s", desc = "Open in a vertical split" },
+  { on = "<C-x>", run = "shell --block -- nvim-remote split %s", desc = "Open in a horizontal split" },
+  { on = "<C-t>", run = "shell --block -- nvim-remote tabedit %s", desc = "Open in a new tab" },
+]
