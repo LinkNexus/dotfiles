@@ -1,0 +1,89 @@
+#!/bin/bash
+# Opens files from yazi in an editor of the same Rex tab. yazi's edit opener
+# and its <C-v>/<C-x>/<C-t> keys (yazi/) call this. Rex's open_in_editor
+# action (rex/init.lua) finds the tab's nvim and vim panes and, with several,
+# asks which one; this script then hands the files over, hides yazi's
+# floating pane and focuses the editor. With no editor in the tab, it splits
+# a new nvim off the tab's tiled panes. Outside Rex it just runs $EDITOR.
+#
+#   rex-open edit|vsplit|split|tabedit FILE...
+
+cmd=$1
+shift
+
+if [ -z "$REX_BLOCK" ] || [ -z "$REX_BIN_DIR" ]; then
+  case $cmd in
+    vsplit) exec "${EDITOR:-vi}" -O "$@" ;;
+    split) exec "${EDITOR:-vi}" -o "$@" ;;
+    tabedit) exec "${EDITOR:-vi}" -p "$@" ;;
+    *) exec "${EDITOR:-vi}" "$@" ;;
+  esac
+fi
+
+rex="$REX_BIN_DIR/rex"
+
+fail() {
+  echo "rex-open: $*" >&2
+  read -rp "Press enter to return to yazi"
+  exit 1
+}
+
+target=$("$rex" do open_in_editor 2>/tmp/rex-open.$$) || fail "$(cat /tmp/rex-open.$$)"
+rm -f /tmp/rex-open.$$
+field() { jq -r ".$1 // empty" <<<"$target"; }
+
+[ "$(field cancelled)" = true ] && exit 0
+session=$(field session_id)
+block=$(field block_id)
+
+# yazi's pane goes first: Rex moves focus off a layer it minimizes
+own_layer=$(field own_layer)
+if [ -n "$own_layer" ]; then
+  jq -n --arg s "$session" --arg l "$own_layer" '{session_id: $s, layer_id: $l, state: "minimized"}' |
+    "$rex" api call -s "$session" session.set_layer_state - >/dev/null
+fi
+
+if [ -z "$block" ]; then
+  flag=
+  case $cmd in
+    vsplit) flag=-O ;;
+    split) flag=-o ;;
+    tabedit) flag=-p ;;
+  esac
+  out=$("$rex" split -s "$session" -b "$(field anchor)" -c "$PWD" -- nvim $flag "$@" 2>&1) || fail "$out"
+  exit 0
+fi
+
+# Must match nvim's utils/rex.lua
+socket="$HOME/.cache/rex-nvim/${block#block:}.sock"
+
+if [ "$(field editor)" = nvim ] && [ -S "$socket" ]; then
+  # Build a Vim list of single-quoted strings; '' escapes a quote inside
+  # one. The quote goes through $q because macOS's bash 3.2 keeps the
+  # backslashes of \' in a ${//} replacement.
+  q="'"
+  files=
+  for f in "$@"; do
+    files+="$q${f//$q/$q$q}$q,"
+  done
+  # Keep the terminal off stdin and stderr: with a tty on either, nvim
+  # stalls about a second before even contacting the server
+  err=$(nvim --server "$socket" \
+    --remote-expr "v:lua.require'utils.rex'.open_files('$cmd', [$files])" 2>&1 >/dev/null </dev/null) ||
+    fail "$err"
+else
+  # vim, or an nvim without the socket: type the command into it, from
+  # normal mode. Ex wants spaces and its special characters escaped.
+  line=$'\e:silent '"$cmd"
+  for f in "$@"; do
+    line+=" $(sed 's/[][ \\%#|"*?$`]/\\&/g' <<<"$f")"
+  done
+  jq -n --arg s "$session" --arg b "$block" --arg d "$line"$'\r' \
+    '{session_id: $s, block_id: $b, args: {data: $d}}' |
+    "$rex" api call -s "$session" com.superlogical.terminal.write - >/dev/null || fail "couldn't type into $block"
+fi
+
+# After a pick the app hands focus back to where the picker opened a moment
+# later; wait that out, or it would undo this
+[ "$(field picked)" = true ] && sleep 0.3
+"$rex" focus -s "$session" "$block" >/dev/null
