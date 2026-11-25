@@ -1,4 +1,5 @@
 {
+  "terminal.integrated.enableImages": true,
   "github.copilot.nextEditSuggestions.enabled": true,
   "editor.fontFamily": "'FiraCode Nerd Font Mono', 'MonaspiceRn Nerd Font', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace",
   "editor.inlineSuggest.fontFamily": "'FiraCode Nerd Font Mono','MonaspiceRn Nerd Font', 'Cascadia Code', Menlo, Monaco, 'Courier New', monospace",
